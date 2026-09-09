@@ -221,11 +221,22 @@ public final class Constants {
     // Defines the named speed settings for teleoperated control.
     // --------------------------------------------------------------------------
     public enum DriveMode {
-      SLOW, // Very low speed for precise maneuvers (e.g., scoring)
-      FAST, // Normal driving speed
-      MAX, // Highest possible speed (e.g., traveling across the field)
-      LIFT // Extremely slow speed for alignment or lifting
+      SLOW(0.3), // Very low speed for precise maneuvers (e.g., scoring)
+      FAST(0.6), // Normal driving speed
+      MAX(0.9), // Highest possible speed (e.g., traveling across the field)
+      SHOOTING(0.2); // Extremely slow speed for shooting better precision on move
 
+      private double speedValue;
+
+      private DriveMode(double speedValue)
+      {
+        this.speedValue = speedValue;
+      }
+
+      public double getSpeedValue()
+      {
+        return speedValue;
+      }
     }
 
     public enum LedMode {
