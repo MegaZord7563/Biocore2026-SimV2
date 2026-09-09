@@ -72,6 +72,10 @@ public class SwerveModule {
         io.applyOutputs(outputs);
     }
 
+    public SwerveModuleState getDesiredState() {
+        return desiredState;
+    }
+
     /**
      * Runs the module with the specified output while controlling to zero degrees.
      */
