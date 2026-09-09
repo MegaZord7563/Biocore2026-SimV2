@@ -46,4 +46,8 @@ public class Gyro
         return inputs.connected;
     }
 
+    public Rotation2d getAngle() 
+    {
+        return inputs.robotRotation2d;
+    }
 }
