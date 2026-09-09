@@ -4,8 +4,11 @@
 
 package br.megazord.frc7563.subsystems.swerve;
 
+import java.util.function.Supplier;
+
 import br.megazord.frc7563.Constants.DriveConstants;
 import br.megazord.frc7563.Constants.DriveConstants.DriveMode;
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
@@ -191,5 +194,61 @@ public class SwerveSubsystem extends SubsystemBase {
   {
     ChassisSpeeds speeds = ChassisSpeeds.fromRobotRelativeSpeeds(getChassisSpeeds(), getGyroAngle());
     return speeds;
+  }
+
+   /**
+   * Method drive with joystick
+   * The use of these parameters as suppliers to dynamically provide speed and
+   * field orientation values.
+   * Suppliers are especially useful in cases where you need to calculate values
+   * dynamically based on factors that can change over time.
+   * The Supplier interface gives you a powerful mechanism to make your FRC robot
+   * code more flexible and adaptable.
+   * Suppliers are incredibly useful in command-based FRC programming because they
+   * allow you to:
+   * Decouple Logic: You can separate the logic for calculating drive parameters
+   * (speeds, orientation)
+   * from the actual drive command. This makes your code cleaner and more
+   * maintainable.
+   * Dynamic Values: You can easily update the speed and orientation values
+   * on-the-fly based on real-time conditions,
+   * such as sensor feedback or joystick input.
+   * 
+   * @param xSpdFunction          Speed of the robot in the x direction (forward).
+   * @param ySpdFunction          Speed of the robot in the y direction
+   *                              (sideways).
+   * @param turningSpdFunction    Angular rate of the robot. rad/s
+   * @param fieldOrientedFunction Boolean indicating if speeds are relative to the
+   *                              field or to therobot.
+   * 
+   **/
+
+  public void driveFieldOriented(Supplier<Double> xSpdFunction,
+      Supplier<Double> ySpdFunction,
+      Supplier<Double> turningSpdFunction,
+      Supplier<Boolean> joystickButtonFunction) {
+
+    // 1. Get real-time joystick inputs
+    double xSpeed = Math.pow(xSpdFunction.get(), 3);
+    double ySpeed = Math.pow(ySpdFunction.get(), 3);
+    double turningSpeed = turningSpdFunction.get();
+    // boolean fieldOriented = fieldOrientedFunction.get();
+    boolean joystickButton = joystickButtonFunction.get();
+
+    // 3. Make the driving smoother
+    xSpeed = xLimiter.calculate(xSpeed) * DriveConstants.kTeleDriveMaxSpeedMetersPerSecond * driveMode.getSpeedValue();
+    ySpeed = yLimiter.calculate(ySpeed) * DriveConstants.kTeleDriveMaxSpeedMetersPerSecond * driveMode.getSpeedValue();
+    turningSpeed = turningLimiter.calculate(turningSpeed) * DriveConstants.kTeleDriveMaxAngularSpeedRadiansPerSecond
+        * (joystickButton ? MathUtil.clamp(driveMode.getSpeedValue() + 0.2, 0, 0.9) : driveMode.getSpeedValue());
+
+    // 4. Construct desired chassis speeds
+    var swerveModuleStates = DriveConstants.kDriveKinematics
+        .toSwerveModuleStates(ChassisSpeeds.fromFieldRelativeSpeeds(xSpeed,
+            ySpeed,
+            turningSpeed,
+            getGyroAngle()));// Do this if fielOrientation is false
+
+    // 6. Output each module states to wheels
+    setModuleStates(swerveModuleStates);// */
   }
 }
