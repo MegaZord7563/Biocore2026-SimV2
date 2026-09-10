@@ -111,7 +111,7 @@ public class SwerveSubsystem extends SubsystemBase {
    * @param bRModule Back-right swerve module.
    * @param gyro     Gyroscope for orientation sensing.
    */
-  private SwerveSubsystem(SwerveModule fLModule, SwerveModule fRModule, SwerveModule bLModule, SwerveModule bRModule,
+  public SwerveSubsystem(SwerveModule fLModule, SwerveModule fRModule, SwerveModule bLModule, SwerveModule bRModule,
       Gyro gyro) {
     this.fLModule = fLModule;
     this.fRModule = fRModule;

@@ -27,6 +27,8 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import br.megazord.frc7563.Constants.RobotConstants;
 import br.megazord.frc7563.build.BuildConstants;
 
+import java.util.Locate;
+
 /**
  * The methods in this class are called automatically corresponding to each
  * mode, as described in

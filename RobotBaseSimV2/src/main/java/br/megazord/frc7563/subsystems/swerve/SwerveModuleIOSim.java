@@ -40,7 +40,7 @@ public class SwerveModuleIOSim implements SwerveModuleIO {
     private double driveAppliedVolts = 0.0;
     private double turnAppliedVolts = 0.0;
 
-    private SwerveModuleIOSim() {
+    public SwerveModuleIOSim() {
         turnPID.enableContinuousInput(-Math.PI, Math.PI);
     }
 

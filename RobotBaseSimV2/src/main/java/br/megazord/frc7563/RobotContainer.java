@@ -4,8 +4,17 @@
 
 package br.megazord.frc7563;
 
+import br.megazord.frc7563.Constants.RobotConstants;
+import br.megazord.frc7563.subsystems.swerve.Gyro;
+import br.megazord.frc7563.subsystems.swerve.GyroIO;
+import br.megazord.frc7563.subsystems.swerve.GyroIOSim;
+import br.megazord.frc7563.subsystems.swerve.SwerveModule;
+import br.megazord.frc7563.subsystems.swerve.SwerveModuleIO;
+import br.megazord.frc7563.subsystems.swerve.SwerveModuleIOSim;
+import br.megazord.frc7563.subsystems.swerve.SwerveSubsystem;
 // Wpilib imports
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 
@@ -19,13 +28,24 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
  * subsystems, commands, and trigger mappings) should be declared here.
  */
 public class RobotContainer {
-  // Joysticks inputs
+  private SwerveSubsystem swerveDrive;
+
+
   public static final CommandXboxController driverJoystick = new CommandXboxController(0);
 
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
    */
   public RobotContainer() {
+    swerveDrive =
+              new SwerveSubsystem(
+                  new SwerveModule(new SwerveModuleIOSim(), "FL"),
+                  new SwerveModule(new SwerveModuleIOSim(), "FR"),
+                  new SwerveModule(new SwerveModuleIOSim(), "BL"),
+                  new SwerveModule(new SwerveModuleIOSim(), "BR"),
+                  new Gyro(new GyroIOSim()));
+
+    swerveDrive.setDefaultCommand(new RunCommand(()-> swerveDrive.driveFieldOriented(()-> driverJoystick.getLeftX(), ()-> driverJoystick.getLeftY(), ()-> driverJoystick.getRightX(), ()-> false), swerveDrive));
 
     configureBindings();
   }
