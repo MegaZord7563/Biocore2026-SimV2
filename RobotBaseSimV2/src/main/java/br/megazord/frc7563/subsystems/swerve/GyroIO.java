@@ -11,7 +11,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 public interface GyroIO 
 {
     @AutoLog
-    public class GyroIOinputs 
+    public class GyroIOInputs 
     {
         boolean connected = false;
         Rotation2d robotRotation2d = new Rotation2d();
@@ -21,5 +21,5 @@ public interface GyroIO
 
     public default void setPosition(Rotation2d angle){}
     
-    public default void updateInputs(GyroIOinputs inputs){}
+    public default void updateInputs(GyroIOInputs inputs){}
 }

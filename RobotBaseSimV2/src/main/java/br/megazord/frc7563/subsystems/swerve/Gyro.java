@@ -14,7 +14,7 @@ import edu.wpi.first.wpilibj.Alert;
 public class Gyro 
 {
     private GyroIO io;
-    private GyroIOinputsAutoLogged inputs = new GyroIOinputsAutoLogged();
+    private GyroIOInputsAutoLogged inputs = new GyroIOInputsAutoLogged();
 
     private Alert gyroDisconnectedAlert = new Alert("Gyro Disconnected Alert", edu.wpi.first.wpilibj.Alert.AlertType.kError);
 
