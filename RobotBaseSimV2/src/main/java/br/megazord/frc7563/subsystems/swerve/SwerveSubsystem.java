@@ -11,6 +11,7 @@ import org.littletonrobotics.junction.AutoLogOutput;
 import br.megazord.frc7563.Constants.DriveConstants;
 import br.megazord.frc7563.Constants.DriveConstants.DriveMode;
 import br.megazord.frc7563.Constants.PathPlannerConstants;
+import br.megazord.frc7563.Constants.RobotConstants;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.VecBuilder;
@@ -247,7 +248,7 @@ public class SwerveSubsystem extends SubsystemBase {
   {
     return new Rotation2d(getChassisSpeeds().omegaRadiansPerSecond);
   }
-  
+
   /**
    * Returns the module states (turn angles and drive velocities) for all the
    * modules.
@@ -331,9 +332,9 @@ public class SwerveSubsystem extends SubsystemBase {
    * @param chassisSpeeds
    */
   public void drive(ChassisSpeeds chassisSpeeds) {
-    // ChassisSpeeds targetSpeeds = ChassisSpeeds.discretize(chassisSpeeds, 0.02);
+    ChassisSpeeds targetSpeeds = ChassisSpeeds.discretize(chassisSpeeds, RobotConstants.loopPeriodSecs);
     SwerveModuleState[] swerveModuleStates = DriveConstants.kDriveKinematics
-        .toSwerveModuleStates(chassisSpeeds);
+        .toSwerveModuleStates(targetSpeeds);
 
     this.setModuleStates(swerveModuleStates);
   }
