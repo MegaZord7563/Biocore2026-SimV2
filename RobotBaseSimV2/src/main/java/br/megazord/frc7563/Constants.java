@@ -55,7 +55,7 @@ public final class Constants {
             REPLAY
         }
 
-        public static final double loopPeriodSecs = 0.005;
+        public static final double loopPeriodSecs = 0.01;
 		public static final boolean enableAlerts = robotMode == MODE.REAL ? true : false;
     }
 

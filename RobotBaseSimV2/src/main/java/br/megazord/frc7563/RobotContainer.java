@@ -4,12 +4,9 @@
 
 package br.megazord.frc7563;
 
-import br.megazord.frc7563.Constants.RobotConstants;
 import br.megazord.frc7563.subsystems.swerve.Gyro;
-import br.megazord.frc7563.subsystems.swerve.GyroIO;
 import br.megazord.frc7563.subsystems.swerve.GyroIOSim;
 import br.megazord.frc7563.subsystems.swerve.SwerveModule;
-import br.megazord.frc7563.subsystems.swerve.SwerveModuleIO;
 import br.megazord.frc7563.subsystems.swerve.SwerveModuleIOSim;
 import br.megazord.frc7563.subsystems.swerve.SwerveSubsystem;
 // Wpilib imports
@@ -45,7 +42,14 @@ public class RobotContainer {
                   new SwerveModule(new SwerveModuleIOSim(), "BR"),
                   new Gyro(new GyroIOSim()));
 
-    swerveDrive.setDefaultCommand(new RunCommand(()-> swerveDrive.driveFieldOriented(()-> driverJoystick.getLeftX(), ()-> driverJoystick.getLeftY(), ()-> driverJoystick.getRightX(), ()-> false), swerveDrive));
+    swerveDrive.setDefaultCommand(
+      new RunCommand(()-> 
+        swerveDrive.driveFieldOriented(
+            ()-> -driverJoystick.getLeftY(), 
+            ()-> -driverJoystick.getLeftX(), 
+            ()-> driverJoystick.getRightX(), 
+            ()-> driverJoystick.rightStick().getAsBoolean()), 
+          swerveDrive));
 
     configureBindings();
   }
@@ -64,7 +68,10 @@ public class RobotContainer {
    * {@link edu.wpi.first.wpilibj2.command.button.CommandJoystick Flight
    * joysticks}.
    */
-  private void configureBindings() {
+  private void configureBindings() 
+  {
+    /** Swerve Comands **/
+    driverJoystick.rightBumber().onTrue(new InstantCommand(()-> swerveDrive.))
   }
 
   /**
