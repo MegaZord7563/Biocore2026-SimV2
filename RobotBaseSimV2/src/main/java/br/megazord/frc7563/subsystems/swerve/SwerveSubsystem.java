@@ -243,6 +243,11 @@ public class SwerveSubsystem extends SubsystemBase {
     return gyro.getAngle();
   }
 
+  public  Rotation2d getAngularVelocity()
+  {
+    return new Rotation2d(getChassisSpeeds().omegaRadiansPerSecond);
+  }
+  
   /**
    * Returns the module states (turn angles and drive velocities) for all the
    * modules.

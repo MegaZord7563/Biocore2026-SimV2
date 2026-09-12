@@ -44,7 +44,7 @@ public class RobotContainer {
                   new SwerveModule(new SwerveModuleIOSim(), "FR"),
                   new SwerveModule(new SwerveModuleIOSim(), "BL"),
                   new SwerveModule(new SwerveModuleIOSim(), "BR"),
-                  new Gyro(new GyroIOSim()));
+                  new Gyro(new GyroIOSim(()-> swerveDrive.getAngularVelocity())));
 
     swerveDrive.setDefaultCommand(new RunCommand(
         () -> swerveDrive.driveFieldOriented(
