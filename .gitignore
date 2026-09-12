@@ -188,3 +188,6 @@ compile_commands.json
 
 # IDE 
 .vscode
+
+# build constants
+src/main/java/br/megazord/frc7563/build
