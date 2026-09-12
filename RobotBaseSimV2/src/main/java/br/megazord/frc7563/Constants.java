@@ -167,7 +167,7 @@ public final class Constants {
     public static final double driveKA = 0.0;//0.0; // 0.27;
 
     // 11,69%
-    public static final double kPdriving = 0.12497;//0.15;//pratic // 1.04; // 0.1;//<--MNL11/11/2024 0.0665;//ANTERIOR 0,0665 ; 0.05872615
+    public static final double kPdriving = 0.2;//0.15;//pratic // 1.04; // 0.1;//<--MNL11/11/2024 0.0665;//ANTERIOR 0,0665 ; 0.05872615
                                                 // // kP =
                                                 // 0.11 An error of 1 rps results in 0.11 V output
     public static final double kIdriving = 0.0;
