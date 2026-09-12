@@ -1,7 +1,7 @@
 <div align="center">
 
-<img src="https://github.com/user-attachments/assets/25f6ee68-5a92-42ed-a6e0-bf9e7c493577" alt="Megazord7563" height="130em" />
-<img src="https://github.com/user-attachments/assets/479393e9-8708-493a-b867-b00a1a843d09" alt="FIRST Biocore" height="130em" />
+<img src="https://github.com/user-attachments/assets/25f6ee68-5a92-42ed-a6e0-bf9e7c493577" alt="Megazord7563" height="150em" />
+<img src="./Biocore.png" alt="FIRST Biocore" height="150em" />
 
 # Biocore2026‑SimV2
 
