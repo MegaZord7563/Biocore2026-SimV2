@@ -7,29 +7,21 @@ on:
 
 jobs:
   build:
-    name: Build robot code
+    name: Build Robot Code
     runs-on: ubuntu-latest
-    container: wpilib/roborio-cross-ubuntu:2026-22.04
 
     steps:
-      - name: Checkout code
+      - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Grant execute permission for gradlew
+      - name: Setup Java 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: 17
+          distribution: temurin
+
+      - name: Give execute permission to Gradle Wrapper
         run: chmod +x gradlew
 
-      - name: Cache Gradle dependencies
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.gradle/caches
-            ~/.gradle/wrapper
-          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle') }}
-          restore-keys: |
-            ${{ runner.os }}-gradle-
-
-      - name: Build with Gradle
-        run: ./gradlew build --no-daemon
-
-      - name: Run unit tests
-        run: ./gradlew test --no-daemon
+      - name: Build Robot
+        run: ./gradlew build
