@@ -194,6 +194,12 @@ public class SwerveSubsystem extends SubsystemBase {
       module.periodic();
     }
 
+    if(DriverStation.isDisabled())
+    {
+      disableModules();
+      
+    }
+
     gyro.periodic();
 
     getModuleStates();
