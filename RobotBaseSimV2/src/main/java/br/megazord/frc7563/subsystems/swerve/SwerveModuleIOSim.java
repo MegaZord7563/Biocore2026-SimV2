@@ -9,6 +9,7 @@ import br.megazord.frc7563.Constants.ModuleConstants;
 import br.megazord.frc7563.Constants.RobotConstants;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Rotation2d;
 // wpilib imports
 import edu.wpi.first.math.system.plant.DCMotor;
@@ -34,6 +35,9 @@ public class SwerveModuleIOSim implements SwerveModuleIO {
 
     private PIDController drivePID = new PIDController(ModuleConstants.kPdriving, ModuleConstants.kIdriving,
             ModuleConstants.kDdriving, RobotConstants.loopPeriodSecs);
+    private SimpleMotorFeedforward driveFF = new SimpleMotorFeedforward(ModuleConstants.driveKS, ModuleConstants.driveKA);
+    private double feedForward = 0.0;
+    
     private PIDController turnPID = new PIDController(ModuleConstants.kPTurning, ModuleConstants.kITurning,
             ModuleConstants.kDTurning, RobotConstants.loopPeriodSecs);
 
@@ -48,7 +52,7 @@ public class SwerveModuleIOSim implements SwerveModuleIO {
     public void updateInputs(SwerveModuleIOInputs inputs) {
         // Run closed-loop control
         if (driveClosedLoop) {
-            driveAppliedVolts = drivePID.calculate(driveMotor.getAngularVelocityRadPerSec());
+            driveAppliedVolts = drivePID.calculate(driveMotor.getAngularVelocityRadPerSec()) + feedForward;
         } else {
             drivePID.reset();
         }
@@ -90,6 +94,7 @@ public class SwerveModuleIOSim implements SwerveModuleIO {
                 driveClosedLoop = true;
                 turnClosedLoop = true;
                 drivePID.setSetpoint(outputs.driveVelocityRadPerSec);
+                feedForward = driveFF.calculate(outputs.driveVelocityRadPerSec);
                 turnPID.setSetpoint(outputs.turnRotation.getRadians());
                 break;
 
