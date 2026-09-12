@@ -4,13 +4,17 @@
 
 package br.megazord.frc7563;
 
+import br.megazord.frc7563.Constants.DriveConstants;
+import br.megazord.frc7563.Constants.OIConstants;
 import br.megazord.frc7563.subsystems.swerve.Gyro;
 import br.megazord.frc7563.subsystems.swerve.GyroIOSim;
 import br.megazord.frc7563.subsystems.swerve.SwerveModule;
 import br.megazord.frc7563.subsystems.swerve.SwerveModuleIOSim;
 import br.megazord.frc7563.subsystems.swerve.SwerveSubsystem;
+import edu.wpi.first.math.MathUtil;
 // Wpilib imports
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -28,7 +32,7 @@ public class RobotContainer {
   private SwerveSubsystem swerveDrive;
 
 
-  public static final CommandXboxController driverJoystick = new CommandXboxController(0);
+  private static final CommandXboxController driverJoystick = new CommandXboxController(0);
 
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -42,15 +46,15 @@ public class RobotContainer {
                   new SwerveModule(new SwerveModuleIOSim(), "BR"),
                   new Gyro(new GyroIOSim()));
 
-    swerveDrive.setDefaultCommand(
-      new RunCommand(()-> 
-        swerveDrive.driveFieldOriented(
-            ()-> -driverJoystick.getLeftY(), 
-            ()-> -driverJoystick.getLeftX(), 
-            ()-> driverJoystick.getRightX(), 
-            ()-> driverJoystick.rightStick().getAsBoolean()), 
-          swerveDrive));
-
+    swerveDrive.setDefaultCommand(new RunCommand(
+        () -> swerveDrive.driveFieldOriented(
+            () -> -MathUtil.applyDeadband(driverJoystick.getLeftY(), OIConstants.kDeadband),
+            () -> -MathUtil.applyDeadband(driverJoystick.getLeftX(), OIConstants.kDeadband),
+            () -> -MathUtil.applyDeadband(driverJoystick.getRightX(), OIConstants.kDeadband),
+            () -> driverJoystick.rightStick().getAsBoolean()),
+        swerveDrive)// .onlyIf(()-> !driverJoystick.getHID().getXButton())
+    );
+    
     configureBindings();
   }
 
@@ -71,7 +75,10 @@ public class RobotContainer {
   private void configureBindings() 
   {
     /** Swerve Comands **/
-    driverJoystick.rightBumber().onTrue(new InstantCommand(()-> swerveDrive.))
+    //speed controls
+    driverJoystick.rightBumper().onTrue(new InstantCommand(()-> swerveDrive.setDriveMode(DriveConstants.DriveMode.FAST), swerveDrive));
+    driverJoystick.leftBumper().onTrue(new InstantCommand(()-> swerveDrive.setDriveMode(DriveConstants.DriveMode.SLOW), swerveDrive));
+    driverJoystick.leftBumper().and(driverJoystick.rightBumper()).onTrue(new InstantCommand(()-> swerveDrive.setDriveMode(DriveConstants.DriveMode.MAX), swerveDrive));
   }
 
   /**
