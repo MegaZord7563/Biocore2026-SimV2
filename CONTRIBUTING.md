@@ -1,18 +1,9 @@
 <div align="center">
 
-<img src="https://github.com/user-attachments/assets/25f6ee68-5a92-42ed-a6e0-bf9e7c493577" alt="Megazord7563" height="90em" />
+<img src="https://github.com/user-attachments/assets/25f6ee68-5a92-42ed-a6e0-bf9e7c493577" alt="Megazord7563" height="150em" />
+<img src="./Biocore.png" alt="FIRST Biocore" height="150em" />
 
 # Contributing to Biocore2026‑SimV2
-
-<sub>Team 7563 Megazord — programming team guidelines</sub>
-
-<br />
-
-<img src="https://img.shields.io/badge/team-FRC_7563-blue?style=flat-square" />
-<img src="https://img.shields.io/badge/code_style-Google_Java_Format-2ea043?style=flat-square" />
-<img src="https://img.shields.io/badge/PRs-welcome-8957e5?style=flat-square" />
-
-<br /><br />
 
 <a href="#-branching-strategy">Branching</a> ·
 <a href="#-version-control-workflow">Workflow</a> ·
