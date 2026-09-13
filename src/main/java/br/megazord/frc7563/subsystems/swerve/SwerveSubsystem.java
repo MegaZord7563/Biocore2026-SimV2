@@ -4,6 +4,7 @@
 
 package br.megazord.frc7563.subsystems.swerve;
 
+import java.util.Set;
 import java.util.function.Supplier;
 
 import org.littletonrobotics.junction.AutoLogOutput;
@@ -24,11 +25,17 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Alert.AlertType;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.DeferredCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 //PathPlanner Imports
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.config.RobotConfig;
+import com.pathplanner.lib.controllers.PPHolonomicDriveController;
+import com.pathplanner.lib.path.PathConstraints;
+import com.pathplanner.lib.path.PathPlannerPath;
 
 public class SwerveSubsystem extends SubsystemBase {
   private SwerveModule fLModule;
@@ -387,5 +394,96 @@ public class SwerveSubsystem extends SubsystemBase {
    */
   public Pose2d getPoseEstimator() {
     return robotState.getEstimatedPose();
+  }
+
+   /**
+   * Pathfinds to a specific pose using PathPlanner.
+   * 
+   * @param poseSupplier The supplier that provides the target pose.
+   * @return selected path command
+   */
+  public Command pathfindToPose(Supplier<Pose2d> poseSupplier, double maxSpeed, double maxAceleration) {
+    PathConstraints telePathConstraints = new PathConstraints(maxSpeed,
+        maxAceleration,
+        2 * Math.PI,
+        3 * Math.PI);
+    // return AutoBuilder.pathfindToPose(poseSupplier.get(), telePathConstraints);
+    return new DeferredCommand(() -> AutoBuilder.pathfindToPose(poseSupplier.get(),
+        telePathConstraints,
+        0),
+        Set.of(this)).beforeStarting(() -> PathPlannerPath.clearCache());
+  }
+
+  /**
+   * Follows a path using PathPlanner.
+   * This method uses the pathfindThenFollowPath method to load a path from a
+   * file.
+   * 
+   * @param path
+   * @return selected path command
+   */
+  public Command pathfindThenFollow(String path) {
+    PathPlannerPath.clearCache();
+
+    try {
+      config = PathPlannerConstants.robotConfig;
+      PathPlannerPath path2go = PathPlannerPath.fromPathFile(path);
+      PathConstraints telePathConstraints = new PathConstraints(1,
+          1,
+          Math.PI,
+          Math.PI);
+
+      return AutoBuilder.pathfindThenFollowPath(path2go, telePathConstraints);
+      // new DeferredCommand(()-> AutoBuilder.pathfindThenFollowPath(path2go,
+      // telePathConstraints), Set.of(this));
+
+    } catch (Exception e) {
+      // Handle exception as needed
+      DriverStation.reportError("Failed to load PathPlanner config and configure AutoBuilder", e.getStackTrace());
+      return Commands.none();
+    }
+  }
+
+  /**
+   * Follows a path using PathPlanner.
+   * This method uses the PathPlannerPath.fromPathFile() method to load a path
+   * from a file.
+   * 
+   * @param pathName
+   * @return selected path command
+   */
+  public Command followPath(String path)
+  {
+    // Clear any existing feedback overrides
+    PathPlannerPath.clearCache();
+    PPHolonomicDriveController.clearXYFeedbackOverride();
+    PPHolonomicDriveController.clearRotationFeedbackOverride();
+    try {
+
+      config = RobotConfig.fromGUISettings();
+      PathPlannerPath path2go = PathPlannerPath.fromPathFile(path);
+
+      return AutoBuilder.followPath(path2go);
+
+    } catch (Exception e) {
+      // Handle exception as needed
+      DriverStation.reportError("Failed to load PathPlanner config and configure AutoBuilder", e.getStackTrace());
+      return Commands.none();
+    }
+  }
+
+  /**
+   * Ends the current path following operation.
+   */
+  public void endPath() {
+    // PPHolonomicDriveController.overrideXYFeedback(() -> 0.0, () -> 0.0);
+    // Calculate feedback from your custom PID controller
+
+    // (() -> this.getPoseEstimator().getX(), ()-> this.getPoseEstimator().getY());
+    PPHolonomicDriveController.overrideRotationFeedback(() -> this.getPoseEstimator().getRotation().getRadians());
+    PPHolonomicDriveController.clearXYFeedbackOverride();
+    PPHolonomicDriveController.clearRotationFeedbackOverride();
+
+    PathPlannerPath.clearCache();
   }
 }
