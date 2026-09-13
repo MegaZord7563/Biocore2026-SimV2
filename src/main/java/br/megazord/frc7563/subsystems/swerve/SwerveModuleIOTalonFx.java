@@ -308,7 +308,7 @@ public class SwerveModuleIOTalonFx implements SwerveModuleIO {
 
     /* Initialize wheels positions */
     public void resetToAbsolute() {
-        double absolutePosition = absoluteCaNcoder.getAbsolutePosition().getValueAsDouble()
+        double absolutePosition = absoluteCaNcoder.getAbsolutePosition().waitForUpdate(0.25).getValueAsDouble()
                 - absoluteEncoderOffset.getRotations();
         turnMotor.setPosition(absolutePosition);
     }

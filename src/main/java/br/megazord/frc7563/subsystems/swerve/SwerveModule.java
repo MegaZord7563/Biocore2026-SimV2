@@ -64,9 +64,9 @@ public class SwerveModule {
 
         outputs.mode = SwerveModuleIOOutputMode.DRIVE;
         double speedRotationsPerSecond = SwerveConversions
-                .metersPerSecToWheelRotationsPerSec(state.speedMetersPerSecond);
+                .metersPerSecToWheelRotationsPerSec(correctState.speedMetersPerSecond);
         outputs.driveVelocityRadPerSec = Units.rotationsToRadians(speedRotationsPerSecond);
-        outputs.turnRotation = state.angle;
+        outputs.turnRotation = correctState.angle;
     }
 
     public SwerveModuleState getDesiredState() {
