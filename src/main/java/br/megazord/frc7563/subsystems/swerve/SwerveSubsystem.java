@@ -52,8 +52,6 @@ public class SwerveSubsystem extends SubsystemBase {
 
   private DriveMode driveMode = DriveMode.SLOW;
 
-  private static SwerveSubsystem instance;
-
   private final SlewRateLimiter xLimiter = new SlewRateLimiter(DriveConstants.kTeleDriveMaxAccelerationUnitsPerSecond);
   private final SlewRateLimiter yLimiter = new SlewRateLimiter(DriveConstants.kTeleDriveMaxAccelerationUnitsPerSecond);
   private final SlewRateLimiter turningLimiter = new SlewRateLimiter(
@@ -139,14 +137,6 @@ public class SwerveSubsystem extends SubsystemBase {
       DriverStation.reportError("Failed to load PathPlanner config and configure AutoBuilder", e.getStackTrace());
       pathPlannerNotInitialized.set(true);
     }
-  }
-
-  public static SwerveSubsystem getInstance(SwerveModule fLModule, SwerveModule fRModule, SwerveModule bLModule,
-      SwerveModule bRModule, Gyro gyro) {
-    if (instance == null) {
-      instance = new SwerveSubsystem(fLModule, fRModule, bLModule, bRModule, gyro);
-    }
-    return instance;
   }
 
   @Override

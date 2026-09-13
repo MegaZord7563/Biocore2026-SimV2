@@ -106,12 +106,16 @@ public class SwerveModuleIOTalonFx implements SwerveModuleIO {
         inputs.driveVelocityRadsPerSec = Units.rotationsToRadians(driveMotor.getVelocity().getValueAsDouble());
         inputs.driveAppliedVolts = driveMotor.getMotorVoltage().getValueAsDouble();
         inputs.driveSupplyCurrentAmps = Math.abs(driveMotor.getSupplyCurrent().getValueAsDouble());
+        inputs.driveTempCelsius = driveMotor.getDeviceTemp().getValueAsDouble();
 
         inputs.turnConnected = turnMotor.isConnected();
         inputs.turnPositionRads = Rotation2d.fromRotations(turnMotor.getPosition().getValueAsDouble());
         inputs.turnAbsolutePositionRads = Rotation2d
                 .fromRotations(absoluteCaNcoder.getAbsolutePosition().getValueAsDouble());
         inputs.turnSupplyCurrentAmps = Math.abs(turnMotor.getSupplyCurrent().getValueAsDouble());
+        inputs.turnAppliedVolts = turnMotor.getMotorVoltage().getValueAsDouble();
+        inputs.turnTempCelsius = turnMotor.getDeviceTemp().getValueAsDouble();
+        inputs.turnVelocityRadsPerSec = Units.rotationsToRadians(turnMotor.getVelocity().getValueAsDouble());
 
         inputs.chassisAngularOffset = chassisAngularOffset;
         inputs.cancoderConnected = absoluteCaNcoder.isConnected();

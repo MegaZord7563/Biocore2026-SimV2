@@ -117,12 +117,12 @@ public class SwerveModule {
 
     /** Returns the module position (turn angle and drive position). */
     public SwerveModulePosition getPosition() {
-        return new SwerveModulePosition(getPositionMeters(), getAngle());
+        return new SwerveModulePosition(getPositionMeters(), getAngle().minus(Rotation2d.fromRadians(inputs.chassisAngularOffset)));
     }
 
     /** Returns the module state (turn angle and drive velocity). */
     public SwerveModuleState getState() {
-        return new SwerveModuleState(getVelocityMetersPerSec(), getAngle());
+        return new SwerveModuleState(getVelocityMetersPerSec(), getAngle().minus(Rotation2d.fromRadians(inputs.chassisAngularOffset)));
     }
 
     /** Returns the module position in radians. */
