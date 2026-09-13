@@ -6,10 +6,13 @@ package br.megazord.frc7563;
 
 import br.megazord.frc7563.Constants.DriveConstants;
 import br.megazord.frc7563.Constants.OIConstants;
+import br.megazord.frc7563.Constants.RobotConstants;
 import br.megazord.frc7563.subsystems.swerve.Gyro;
+import br.megazord.frc7563.subsystems.swerve.GyroIOPygeon2;
 import br.megazord.frc7563.subsystems.swerve.GyroIOSim;
 import br.megazord.frc7563.subsystems.swerve.SwerveModule;
 import br.megazord.frc7563.subsystems.swerve.SwerveModuleIOSim;
+import br.megazord.frc7563.subsystems.swerve.SwerveModuleIOTalonFx;
 import br.megazord.frc7563.subsystems.swerve.SwerveSubsystem;
 import edu.wpi.first.math.MathUtil;
 // Wpilib imports
@@ -29,20 +32,64 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
  * subsystems, commands, and trigger mappings) should be declared here.
  */
 public class RobotContainer {
+  // Subsystems instance
   private SwerveSubsystem swerveDrive;
+
+  //controllers intace
   public final CommandXboxController driverJoystick = new CommandXboxController(0);
 
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
    */
   public RobotContainer() {
-    swerveDrive =
+    switch (RobotConstants.robotMode) {
+      case SIM:
+        swerveDrive =
               new SwerveSubsystem(
                   new SwerveModule(new SwerveModuleIOSim(), "FL"),
                   new SwerveModule(new SwerveModuleIOSim(), "FR"),
                   new SwerveModule(new SwerveModuleIOSim(), "BL"),
                   new SwerveModule(new SwerveModuleIOSim(), "BR"),
                   new Gyro(new GyroIOSim(()-> swerveDrive.getAngularVelocity())));
+        break;
+      case REAL:
+        swerveDrive =
+              new SwerveSubsystem(
+                  new SwerveModule(new SwerveModuleIOTalonFx(
+                    DriveConstants.kFrontLeftDriveMotorPort,
+                    DriveConstants.kFrontLeftTurningMotorPort,
+                    DriveConstants.kFrontLeftDriveAbsoluteEncoderPort,
+                    DriveConstants.angleOffsetFLTurning,
+                    DriveConstants.kFrontLeftChassisAngularOffset),
+                  "FL"),
+                  new SwerveModule(new SwerveModuleIOTalonFx(
+                    DriveConstants.kFrontRightDriveMotorPort,
+                    DriveConstants.kFrontRightTurningMotorPort,
+                    DriveConstants.kFrontRightDriveAbsoluteEncoderPort,
+                    DriveConstants.angleOffsetFRTurning,
+                    DriveConstants.kFrontRightChassisAngularOffset
+                  ), 
+                  "FR"),
+                  new SwerveModule(new SwerveModuleIOTalonFx(
+                    DriveConstants.kBackLeftDriveMotorPort,
+                    DriveConstants.kBackLeftTurningMotorPort,
+                    DriveConstants.kBackLeftDriveAbsoluteEncoderPort,
+                    DriveConstants.angleOffsetBLTurning,
+                    DriveConstants.kBackLeftChassisAngularOffset
+                  ), 
+                  "BL"),
+                  new SwerveModule(new SwerveModuleIOTalonFx(
+                    DriveConstants.kBackRightDriveMotorPort,
+                    DriveConstants.kBackRightTurningMotorPort,
+                    DriveConstants.kBackRightDriveAbsoluteEncoderPort,
+                    DriveConstants.angleOffsetBRTurning,
+                    DriveConstants.kBackRightChassisAngularOffset
+                  ), 
+                  "BR"),
+                  new Gyro(new GyroIOPygeon2()));
+      default:
+        break;
+    }
 
     swerveDrive.setDefaultCommand(new RunCommand(
         () -> swerveDrive.driveFieldOriented(
