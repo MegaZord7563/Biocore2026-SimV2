@@ -78,6 +78,9 @@ public class SwerveModuleIOTalonFx implements SwerveModuleIO {
         initializeTurningMotor();
         // Initialize drive motor
         initializeDriveMotor();
+
+        //reset to absolute
+        resetToAbsolute();
     }
 
     @Override
@@ -102,15 +105,16 @@ public class SwerveModuleIOTalonFx implements SwerveModuleIO {
         inputs.drivePositionRads = Units.rotationsToRadians(driveMotor.getPosition().getValueAsDouble());
         inputs.driveVelocityRadsPerSec = Units.rotationsToRadians(driveMotor.getVelocity().getValueAsDouble());
         inputs.driveAppliedVolts = driveMotor.getMotorVoltage().getValueAsDouble();
-        inputs.driveSupplyCurrentAmps = Math.abs(driveMotor.getStatorCurrent().getValueAsDouble());
+        inputs.driveSupplyCurrentAmps = Math.abs(driveMotor.getSupplyCurrent().getValueAsDouble());
 
         inputs.turnConnected = turnMotor.isConnected();
         inputs.turnPositionRads = Rotation2d.fromRotations(turnMotor.getPosition().getValueAsDouble());
         inputs.turnAbsolutePositionRads = Rotation2d
                 .fromRotations(absoluteCaNcoder.getAbsolutePosition().getValueAsDouble());
-        inputs.turnSupplyCurrentAmps = Math.abs(driveMotor.getStatorCurrent().getValueAsDouble());
+        inputs.turnSupplyCurrentAmps = Math.abs(turnMotor.getSupplyCurrent().getValueAsDouble());
 
         inputs.chassisAngularOffset = chassisAngularOffset;
+        inputs.cancoderConnected = absoluteCaNcoder.isConnected();
     }
 
     @Override
@@ -202,8 +206,8 @@ public class SwerveModuleIOTalonFx implements SwerveModuleIO {
 
                 // PID Slot0
                 .withSlot0(new Slot0Configs()
-                        .withKV(ModuleConstants.driveKV) // Add 0.1 V output to overcome static friction
-                        .withKS(ModuleConstants.driveKS) // A velocity target of 1 rps results in 0.12 V output
+                        .withKV(ModuleConstants.driveKV) 
+                        .withKS(ModuleConstants.driveKS) 
                         .withKP(ModuleConstants.kPdriving) // An error of 1 rps results in 0.11 V output
                         .withKI(ModuleConstants.kIdriving) // no output for integrated error
                         .withKD(ModuleConstants.kDdriving)) // no output for error derivative
@@ -281,9 +285,8 @@ public class SwerveModuleIOTalonFx implements SwerveModuleIO {
 
                 // PID Slot0
                 .withSlot0(new Slot0Configs()
-                        .withKS(ModuleConstants.turningKS) // 0.1; // Add 0.1 V output to overcome static friction
-                        .withKV(ModuleConstants.turningKV) // 0.12; // A velocity target of 1 rps results in 0.12 V
-                                                           // output
+                        .withKS(ModuleConstants.turningKS) 
+                        .withKV(ModuleConstants.turningKV) 
                         .withKP(ModuleConstants.kPTurning) // 0.11; // An error of 1 rps results in 0.11 V output
                         .withKI(ModuleConstants.kITurning) // 0; // no output for integrated error
                         .withKD(ModuleConstants.kDTurning) // 0; // no output for error derivative
@@ -305,8 +308,8 @@ public class SwerveModuleIOTalonFx implements SwerveModuleIO {
 
     /* Initialize wheels positions */
     public void resetToAbsolute() {
-
-        double absolutePosition = absoluteCaNcoder.getAbsolutePosition().getValueAsDouble() - absoluteEncoderOffset.getRotations();
+        double absolutePosition = absoluteCaNcoder.getAbsolutePosition().getValueAsDouble()
+                - absoluteEncoderOffset.getRotations();
         turnMotor.setPosition(absolutePosition);
     }
 }

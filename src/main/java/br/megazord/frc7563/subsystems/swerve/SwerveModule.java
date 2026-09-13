@@ -56,13 +56,11 @@ public class SwerveModule {
     public void setDesiredState(SwerveModuleState state) {
         desiredState = state;
 
-        SwerveModuleState correctState = new SwerveModuleState();
-
-        correctState = state;
+        SwerveModuleState correctState = new SwerveModuleState(state.speedMetersPerSecond, state.angle);
 
         correctState.optimize(inputs.turnPositionRads);
         correctState.cosineScale(inputs.turnPositionRads);
-        correctState.angle.plus(Rotation2d.fromRadians(inputs.chassisAngularOffset));
+        correctState.angle = correctState.angle.plus(Rotation2d.fromRadians(inputs.chassisAngularOffset));
 
         outputs.mode = SwerveModuleIOOutputMode.DRIVE;
         double speedRotationsPerSecond = SwerveConversions
