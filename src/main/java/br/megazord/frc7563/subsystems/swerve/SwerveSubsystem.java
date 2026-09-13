@@ -349,7 +349,7 @@ public class SwerveSubsystem extends SubsystemBase {
     xSpeed = xLimiter.calculate(xSpeed) * DriveConstants.kTeleDriveMaxSpeedMetersPerSecond * driveMode.getSpeedValue();
     ySpeed = yLimiter.calculate(ySpeed) * DriveConstants.kTeleDriveMaxSpeedMetersPerSecond * driveMode.getSpeedValue();
     turningSpeed = turningLimiter.calculate(turningSpeed) * DriveConstants.kTeleDriveMaxAngularSpeedRadiansPerSecond
-        * (joystickButton ? MathUtil.clamp(driveMode.getSpeedValue() + 0.2, 0, 0.9) : driveMode.getSpeedValue());
+        * (!joystickButton ? 0.75 : 0.95);
 
     // 4. Construct desired chassis speeds
     var swerveModuleStates = DriveConstants.kDriveKinematics
