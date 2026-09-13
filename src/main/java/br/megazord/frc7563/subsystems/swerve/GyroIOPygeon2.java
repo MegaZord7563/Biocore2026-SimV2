@@ -87,9 +87,6 @@ public class GyroIOPygeon2 implements GyroIO {
             System.out.println("Could not apply gyro configs, error code: " + status.toString());
         }
 
-        /* And initialize yaw to 0 */
-        // MUST NOT TOUCH
-
         /* Speed up signals to an appropriate rate */
         BaseStatusSignal.setUpdateFrequencyForAll(
                 100, gyro.getYaw(),
