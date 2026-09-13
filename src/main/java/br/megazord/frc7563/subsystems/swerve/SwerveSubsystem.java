@@ -13,7 +13,6 @@ import br.megazord.frc7563.Constants.DriveConstants.DriveMode;
 import br.megazord.frc7563.Constants.PathPlannerConstants;
 import br.megazord.frc7563.Constants.RobotConstants;
 import br.megazord.frc7563.RobotState;
-import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
