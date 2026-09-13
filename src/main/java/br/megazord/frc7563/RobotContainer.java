@@ -30,8 +30,6 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
  */
 public class RobotContainer {
   private SwerveSubsystem swerveDrive;
-
-
   private static final CommandXboxController driverJoystick = new CommandXboxController(0);
 
   /**

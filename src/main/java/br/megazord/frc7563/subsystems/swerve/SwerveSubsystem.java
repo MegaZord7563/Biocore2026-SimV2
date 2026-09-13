@@ -19,15 +19,13 @@ import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
-import edu.wpi.first.networktables.NetworkTableInstance;
-import edu.wpi.first.networktables.StructArrayPublisher;
-import edu.wpi.first.networktables.StructPublisher;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
@@ -58,36 +56,6 @@ public class SwerveSubsystem extends SubsystemBase {
       DriveConstants.kTeleDriveMaxAngularAccelerationUnitsPerSecond);
 
   /**
-   * NetworkTables publisher for Pose2d data.
-   * Useful for debugging and visualization in tools like Shuffleboard or custom
-   * dashboards.
-   * Advantage Scope: Can visualize robot pose in real-time.
-   */
-  private StructPublisher<Pose2d> publisher = NetworkTableInstance.getDefault()
-      .getStructTopic("MyPose", Pose2d.struct)
-      .publish();
-
-  private StructArrayPublisher<SwerveModuleState> publisherMeasured = NetworkTableInstance.getDefault()
-      .getStructArrayTopic("MyMeasuredStates", SwerveModuleState.struct)
-      .publish();
-
-  private StructArrayPublisher<SwerveModuleState> publisherDesired = NetworkTableInstance.getDefault()
-      .getStructArrayTopic("MyDesiredStates", SwerveModuleState.struct)
-      .publish();
-
-  private StructPublisher<ChassisSpeeds> publisherChassisSpeeds = NetworkTableInstance.getDefault()
-      .getStructTopic("MyChassisSpeeds", ChassisSpeeds.struct)
-      .publish();
-
-  private StructPublisher<ChassisSpeeds> publisherFieldChassisSpeeds = NetworkTableInstance.getDefault()
-      .getStructTopic("MyChassisSpeedRelativeField", ChassisSpeeds.struct)
-      .publish();
-
-  private StructPublisher<Rotation2d> publisherRotation2d = NetworkTableInstance.getDefault()
-      .getStructTopic("MyRotation2d", Rotation2d.struct)
-      .publish();
-
-  /**
    * Standard deviations for the odometry and vision measurements.
    */
   private static final Matrix<N3, N1> odometryStdDevs = VecBuilder.fill(0.015, 0.015, (10 * Math.PI) / 180);// 5 graus
@@ -101,7 +69,6 @@ public class SwerveSubsystem extends SubsystemBase {
 
   // PathPlanner Config
   private RobotConfig config;
-
 
   /**
    * Private constructor for the SwerveSubsystem singleton.
@@ -195,10 +162,8 @@ public class SwerveSubsystem extends SubsystemBase {
       module.periodic();
     }
 
-    if(DriverStation.isDisabled())
-    {
+    if (DriverStation.isDisabled()) {
       disableModules();
-      
     }
 
     gyro.periodic();
@@ -207,21 +172,6 @@ public class SwerveSubsystem extends SubsystemBase {
     getModulePositions();
 
     updatePoseEstimator();
-    
-    // Publish the pose to NetworkTables
-    publisher.set(this.getPoseEstimator());
-
-    // Publish the module states to NetworkTables
-    publisherMeasured.set(getModuleStates());
-
-    // Publish the desired module states to NetworkTables
-    publisherDesired.set(getModuleDesiredStates());
-
-    publisherChassisSpeeds.set(this.getChassisSpeeds());
-
-    publisherRotation2d.set(this.getPoseEstimator().getRotation());
-
-    publisherFieldChassisSpeeds.set(this.getRelativeFieldChassisSpeeds());// this.getRelativeFieldChassisSpeeds());
   }
 
   public void setDriveMode(DriveMode mode) {
@@ -240,12 +190,12 @@ public class SwerveSubsystem extends SubsystemBase {
     return driveMode;
   }
 
+  @AutoLogOutput(key = "Drive/Gyro/Rotation2d")
   public Rotation2d getGyroAngle() {
     return gyro.getAngle();
   }
 
-  public  Rotation2d getAngularVelocity()
-  {
+  public Rotation2d getAngularVelocity() {
     return new Rotation2d(getChassisSpeeds().omegaRadiansPerSecond);
   }
 
@@ -358,6 +308,16 @@ public class SwerveSubsystem extends SubsystemBase {
     return speeds;
   }
 
+  public Translation2d getSpeedTranslation() {
+    ChassisSpeeds speeds = getRelativeFieldChassisSpeeds();
+    return new Translation2d(speeds.vxMetersPerSecond, speeds.vyMetersPerSecond);
+  }
+
+  public Pose2d getChassisSpeedPose2d() {
+    ChassisSpeeds speeds = getRelativeFieldChassisSpeeds();
+    return new Pose2d(speeds.vxMetersPerSecond, speeds.vyMetersPerSecond, new Rotation2d(speeds.omegaRadiansPerSecond));
+  }
+
   /**
    * Method drive with joystick
    * The use of these parameters as suppliers to dynamically provide speed and
@@ -415,8 +375,8 @@ public class SwerveSubsystem extends SubsystemBase {
   }
 
   /** Updates the field relative position of the robot. */
-  public void updatePoseEstimator() 
-  {
+  @AutoLogOutput(key = "Drive/PoseEstimator")
+  public void updatePoseEstimator() {
     // Update the pose estimator with the latest sensor measurements
     m_poseEstimator.update(getGyroAngle(),
         this.getModulePositions()// MNL 10/03/2025
@@ -429,8 +389,7 @@ public class SwerveSubsystem extends SubsystemBase {
    * 
    * @param pose The pose to set the odometry.
    */
-  public void resetOdometry(Pose2d pose) 
-  {
+  public void resetOdometry(Pose2d pose) {
     m_poseEstimator.resetPosition(getGyroAngle(),
         this.getModulePositions(), // MNL 10/03/2025
         pose);
@@ -441,8 +400,7 @@ public class SwerveSubsystem extends SubsystemBase {
    * 
    * @return estimated position
    */
-  public Pose2d getPoseEstimator() 
-  {
+  public Pose2d getPoseEstimator() {
     return m_poseEstimator.getEstimatedPosition();
   }
 
