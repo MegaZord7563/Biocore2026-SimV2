@@ -26,6 +26,9 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 // local imports
 import br.megazord.frc7563.Constants.RobotConstants;
 import br.megazord.frc7563.build.BuildConstants;
+import br.megazord.frc7563.util.Elastic;
+import br.megazord.frc7563.util.Elastic.Notification;
+import br.megazord.frc7563.util.Elastic.NotificationLevel;
 
 
 /**
@@ -56,6 +59,8 @@ public class Robot extends LoggedRobot {
   private Alert driverJoystickAlert = new Alert(
       "DriverJoystick on port 0 is not connected. Please connect the joystick and restart the robot.",
       Alert.AlertType.kWarning);
+  private Boolean lastStateDriverJoystick = false;
+  private Notification driverJoystickNotification = new Notification(NotificationLevel.WARNING, "Driver Joystick Was Disconnected", "Please Connect Again");
 
   private Alert arcadeJoyLeftAlert = new Alert(
       "Mesinha on port 1 is not connected. Please connect and restart the robot.",
@@ -217,7 +222,9 @@ public class Robot extends LoggedRobot {
     Logger.recordOutput("Robot/BatteryVoltage", batteryVoltage);
     Logger.recordOutput("Robot/MatchTime", DriverStation.getMatchTime());
 
-    // driverJoystickAlert.set();
+    driverJoystickAlert.set(!m_robotContainer.driverJoystick.isConnected());
+    if(!m_robotContainer.driverJoystick.isConnected() && lastStateDriverJoystick) {Elastic.sendNotification(driverJoystickNotification);}
+    lastStateDriverJoystick = !m_robotContainer.driverJoystick.isConnected();
     // arcadeJoyLeftAlert.set();
     // arcadeJoyRightAlert.set();
   }
@@ -239,6 +246,9 @@ public class Robot extends LoggedRobot {
     autoStart = Timer.getTimestamp();
     autoMessagePrinted = false;
 
+    //Select Elastic Tab
+    Elastic.selectTab("Autonomous");
+
     // schedule the autonomous command (example)
     if (m_autonomousCommand != null) {
       CommandScheduler.getInstance().schedule(m_autonomousCommand);
@@ -258,6 +268,9 @@ public class Robot extends LoggedRobot {
     if (m_autonomousCommand != null) {
       m_autonomousCommand.cancel();
     }
+
+    //Select Elastic Tab
+    Elastic.selectTab("Teleoperated");
 
     lowBatteryTimer.reset();
   }

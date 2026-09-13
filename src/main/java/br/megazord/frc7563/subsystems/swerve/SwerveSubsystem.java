@@ -12,10 +12,7 @@ import br.megazord.frc7563.Constants.DriveConstants;
 import br.megazord.frc7563.Constants.DriveConstants.DriveMode;
 import br.megazord.frc7563.Constants.PathPlannerConstants;
 import br.megazord.frc7563.Constants.RobotConstants;
-import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.Matrix;
-import edu.wpi.first.math.VecBuilder;
-import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
+import br.megazord.frc7563.RobotState;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -24,9 +21,9 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
-import edu.wpi.first.math.numbers.N1;
-import edu.wpi.first.math.numbers.N3;
+import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 //PathPlanner Imports
@@ -42,7 +39,7 @@ public class SwerveSubsystem extends SubsystemBase {
 
   private SwerveModule[] modules = new SwerveModule[4];
 
-  private final SwerveDrivePoseEstimator m_poseEstimator;
+  private final RobotState robotState = RobotState.getInstance();
 
   private SwerveModuleState[] desiredStates = new SwerveModuleState[4];
 
@@ -55,20 +52,9 @@ public class SwerveSubsystem extends SubsystemBase {
   private final SlewRateLimiter turningLimiter = new SlewRateLimiter(
       DriveConstants.kTeleDriveMaxAngularAccelerationUnitsPerSecond);
 
-  /**
-   * Standard deviations for the odometry and vision measurements.
-   */
-  private static final Matrix<N3, N1> odometryStdDevs = VecBuilder.fill(0.015, 0.015, (10 * Math.PI) / 180);// 5 graus
-                                                                                                            // em
-                                                                                                            // radianos
-                                                                                                            // 5° ×
-                                                                                                            // π/180
-  private static final Matrix<N3, N1> visionStdDevs = VecBuilder.fill(0.15, 0.15, (5 * Math.PI) / 180);// 5 graus em
-                                                                                                       // radianos 5° ×
-                                                                                                       // π/180
-
   // PathPlanner Config
   private RobotConfig config;
+  private Alert pathPlannerNotInitialized = new Alert("PathPlanner has an initialize error! Please restart RobotCode!", AlertType.kError);
 
   /**
    * Private constructor for the SwerveSubsystem singleton.
@@ -92,8 +78,9 @@ public class SwerveSubsystem extends SubsystemBase {
     modules[2] = this.bLModule;
     modules[3] = this.bRModule;
 
-    // Initialize pose estimator ALWAYS towards to red wall
-    m_poseEstimator = new SwerveDrivePoseEstimator(
+    // Initialize pose estimator (owned by RobotState now) ALWAYS towards to red
+    // wall
+    robotState.initializePoseEstimator(
         DriveConstants.kDriveKinematics,
         getGyroAngle(),
         new SwerveModulePosition[] {
@@ -102,9 +89,7 @@ public class SwerveSubsystem extends SubsystemBase {
             bLModule.getPosition(),
             bRModule.getPosition()
         },
-        new Pose2d(),
-        odometryStdDevs, // 5 graus em radianos 5° × π/180
-        visionStdDevs);// 30 graus em radianos 30° × π/180
+        new Pose2d());
 
     /**
      * Initialize the PathPlanner config and AutoBuilder
@@ -145,6 +130,7 @@ public class SwerveSubsystem extends SubsystemBase {
     } catch (Exception e) {
       // Handle exception as needed
       DriverStation.reportError("Failed to load PathPlanner config and configure AutoBuilder", e.getStackTrace());
+      pathPlannerNotInitialized.set(true);
     }
   }
 
@@ -172,6 +158,8 @@ public class SwerveSubsystem extends SubsystemBase {
     getModulePositions();
 
     updatePoseEstimator();
+
+    robotState.setMeasuredChassisSpeeds(getChassisSpeeds());
   }
 
   public void setDriveMode(DriveMode mode) {
@@ -309,8 +297,7 @@ public class SwerveSubsystem extends SubsystemBase {
   }
 
   public Translation2d getSpeedTranslation() {
-    ChassisSpeeds speeds = getRelativeFieldChassisSpeeds();
-    return new Translation2d(speeds.vxMetersPerSecond, speeds.vyMetersPerSecond);
+    return robotState.getSpeedTranslation();
   }
 
   public Pose2d getChassisSpeedPose2d() {
@@ -361,7 +348,7 @@ public class SwerveSubsystem extends SubsystemBase {
     xSpeed = xLimiter.calculate(xSpeed) * DriveConstants.kTeleDriveMaxSpeedMetersPerSecond * driveMode.getSpeedValue();
     ySpeed = yLimiter.calculate(ySpeed) * DriveConstants.kTeleDriveMaxSpeedMetersPerSecond * driveMode.getSpeedValue();
     turningSpeed = turningLimiter.calculate(turningSpeed) * DriveConstants.kTeleDriveMaxAngularSpeedRadiansPerSecond
-        * (joystickButton ? MathUtil.clamp(driveMode.getSpeedValue() + 0.2, 0, 0.9) : driveMode.getSpeedValue());
+        * (!joystickButton ? 0.75 : 0.95);
 
     // 4. Construct desired chassis speeds
     var swerveModuleStates = DriveConstants.kDriveKinematics
@@ -374,11 +361,9 @@ public class SwerveSubsystem extends SubsystemBase {
     setModuleStates(swerveModuleStates);// */
   }
 
-  /** Updates the field relative position of the robot. */
-  @AutoLogOutput(key = "Drive/PoseEstimator")
+  /** Feeds the latest sensor measurements into RobotState's pose estimator. */
   public void updatePoseEstimator() {
-    // Update the pose estimator with the latest sensor measurements
-    m_poseEstimator.update(getGyroAngle(),
+    robotState.addOdometryObservation(getGyroAngle(),
         this.getModulePositions()// MNL 10/03/2025
     );
   }
@@ -390,8 +375,8 @@ public class SwerveSubsystem extends SubsystemBase {
    * @param pose The pose to set the odometry.
    */
   public void resetOdometry(Pose2d pose) {
-    m_poseEstimator.resetPosition(getGyroAngle(),
-        this.getModulePositions(), // MNL 10/03/2025
+    robotState.resetPose(getGyroAngle(),
+        this.getModulePositions(), 
         pose);
   }
 
@@ -401,7 +386,6 @@ public class SwerveSubsystem extends SubsystemBase {
    * @return estimated position
    */
   public Pose2d getPoseEstimator() {
-    return m_poseEstimator.getEstimatedPosition();
+    return robotState.getEstimatedPose();
   }
-
 }
