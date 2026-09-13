@@ -7,6 +7,7 @@ package br.megazord.frc7563;
 import br.megazord.frc7563.Constants.DriveConstants;
 import br.megazord.frc7563.Constants.OIConstants;
 import br.megazord.frc7563.Constants.RobotConstants;
+import br.megazord.frc7563.subsystems.LedSubsystem;
 import br.megazord.frc7563.subsystems.swerve.Gyro;
 import br.megazord.frc7563.subsystems.swerve.GyroIOPygeon2;
 import br.megazord.frc7563.subsystems.swerve.GyroIOSim;
@@ -34,6 +35,7 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 public class RobotContainer {
   // Subsystems instance
   private SwerveSubsystem swerveDrive;
+  public static LedSubsystem ledSubsystem;
 
   //controllers intace
   public final CommandXboxController driverJoystick = new CommandXboxController(0);
@@ -90,6 +92,8 @@ public class RobotContainer {
       default:
         break;
     }
+
+    ledSubsystem = new LedSubsystem(swerveDrive);
 
     swerveDrive.setDefaultCommand(new RunCommand(
         () -> swerveDrive.driveFieldOriented(
