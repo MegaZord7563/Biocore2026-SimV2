@@ -448,6 +448,95 @@ public final class Constants {
 
   }
 
+  /**
+   * Vision constants, split the same way {@code VisionIO} splits its readings:
+   * global (field-relative, feeds the pose estimator) vs local (robot-relative target
+   * tracking, independent of the estimator). See {@code VisionSubsystem}.
+   */
+  public static final class VisionConstants {
+
+    /**
+     * Per-camera configuration: NetworkTables name (set in the Limelight web UI - NOT
+     * necessarily "limelight"), mount offset (robot origin -> camera lens, x forward/y left/z
+     * up meters, roll/pitch/yaw radians), and IMU mode.
+     *
+     * <p>
+     * {@code imuMode} mirrors the modes described in Limelight's docs: {@code 0} = MT2 uses only
+     * the yaw fed in via {@code setRobotOrientation}, internal IMU ignored; {@code 1} = same,
+     * but also seeds/syncs the camera's own internal IMU fused-yaw to match the submitted yaw
+     * (useful on exactly one "primary" camera so its IMU is a valid fallback); {@code 2} = MT2
+     * uses the camera's own internal IMU instead of a submitted yaw. Splitting this per camera
+     * is what let the old setup run one camera in mode 1 and the others in mode 2.
+     */
+    public record CameraConfig(String name, Transform3d robotToCamera, int imuMode) {
+    }
+
+    // MEASURE THESE ON THE ROBOT - a wrong offset here silently biases every vision-corrected
+    // pose by that offset. Currently placeholders; names/offsets carried over from the previous
+    // robot's 3-camera layout (front/left/right) as a starting point.
+    public static final CameraConfig[] kCameras = {
+        new CameraConfig("limelight-front",
+            new Transform3d(Units.inchesToMeters(12.0), 0.0, Units.inchesToMeters(8.5),
+                new Rotation3d(0.0, Units.degreesToRadians(-15.0), 0.0)),
+            1),
+        new CameraConfig("limelight-left",
+            new Transform3d(-0.211, -0.34695, 0.368,
+                new Rotation3d(Units.degreesToRadians(180), Units.degreesToRadians(30), Units.degreesToRadians(90))),
+            2),
+        new CameraConfig("limelight-right",
+            new Transform3d(-0.108, 0.332, 0.293,
+                new Rotation3d(Units.degreesToRadians(180), Units.degreesToRadians(30), Units.degreesToRadians(-90))),
+            2),
+    };
+
+    // ---- Global pose "best of N" selection (see VisionSubsystem.selectBestGlobalPose) ----
+    // Every camera reports a candidate global pose each loop; only the single best one (by
+    // largest average tag area) among the valid candidates gets fed to the pose estimator -
+    // carried over as-is from the old setup's addPoseVisionNew().
+    /** A candidate must have at least one tag and be closer than this to be considered at all. */
+    public static final double kBestPoseMaxTagDistanceMeters = 3.5;
+    /**
+     * While the robot is spinning faster than this (deg/s), every camera's global pose is
+     * rejected for the loop - fast rotation is exactly when MT2's yaw-derived solve gets least
+     * reliable (motion blur, gyro lag). Matches the old rejection threshold.
+     */
+    public static final double kMaxYawRateForVisionDegPerSec = 720.0;
+
+    // ---- Global pose standard deviation scaling (see VisionSubsystem.stdDevsFor) ----
+    // xyStdDev = kGlobalXyStdDevBase * avgDistanceMeters^2 / tagCount, clamped to [min, max].
+    // This is deliberately more granular than the old setup's flat (0.7, 0.7) xy figure - it
+    // scales continuously with distance/tag count instead of relying only on the pre-filter.
+    public static final double kGlobalXyStdDevBase = 0.02;
+    public static final double kGlobalXyStdDevMin = 0.02;
+    public static final double kGlobalXyStdDevMax = 1.0;
+    /**
+     * Deliberately huge (not distance-scaled) - carried over from the old setup's {@code
+     * visionPoseStdDevs} theta of 9999999, and for the same reason: MegaTag2's yaw comes FROM
+     * the gyro yaw we feed it via {@code setRobotOrientation}, so letting vision "correct" the
+     * estimator's heading from an MT2 reading is close to circular - it mostly just returns the
+     * gyro's own yaw back with extra noise, and could mask real gyro drift instead of catching
+     * it. Vision only gets to correct heading during the one-time MT1 seed in {@code
+     * trySeedPose}, where the heading genuinely isn't gyro-derived yet.
+     */
+    public static final double kGlobalThetaStdDev = 9999999;
+
+    // ---- Cold-boot pose seeding (see VisionSubsystem.trySeedPose) ----
+    // For the first kSeedReadingCount good MT1 (gyro-independent) reads after code start, the
+    // pose estimator is snapped hard to vision instead of gently blended - this is what lets the
+    // robot boot up already knowing where it is, instead of starting from (0,0,0) and drifting
+    // into correctness. Same role the old setup's seedLimelightHeading() + first-50-loop window
+    // played, but seeds full pose (translation + heading) through the normal vision-observation
+    // path instead of poking the gyro directly.
+    public static final int kSeedTagCountRequired = 2;
+    public static final int kSeedReadingCount = 3;
+    public static final double kSeedXyStdDev = 0.001;
+    public static final double kSeedThetaStdDev = Units.degreesToRadians(0.1);
+
+    // ---- Local (robot-relative) target tracking ----
+    /** A local target reading with area below this is treated as detector noise, not a real tag. */
+    public static final double kMinTargetAreaPercent = 0.05;
+  }
+
   /*
    * Subsystems Constants
    * 

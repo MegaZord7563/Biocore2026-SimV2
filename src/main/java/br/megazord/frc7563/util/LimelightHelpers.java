@@ -1,3 +1,7 @@
+// Vendored from https://github.com/LimelightVision/limelightlib-wpijava (LimelightHelpers v1.14).
+// Single-file drop-in library published by Limelight Vision for reading Limelight NetworkTables
+// output in WPILib Java projects - not modified from upstream beyond the package declaration.
+
 //LimelightHelpers v1.14 (REQUIRES LLOS 2026.0 OR LATER)
 
 package br.megazord.frc7563.util;
@@ -14,7 +18,6 @@ import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation2d;
-
 import java.util.Arrays;
 import java.util.Map;
 
