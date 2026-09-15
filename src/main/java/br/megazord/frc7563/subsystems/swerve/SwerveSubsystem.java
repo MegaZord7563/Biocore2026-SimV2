@@ -29,6 +29,7 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -58,6 +59,7 @@ public class SwerveSubsystem extends SubsystemBase {
   private DriveMode driveMode = DriveMode.SLOW;
 
   /** Limelight seed */
+  private boolean isAllianceReset = false;
   private boolean allianceSeedHeading = false;
   private double countLL = 0;
 
@@ -166,8 +168,19 @@ public class SwerveSubsystem extends SubsystemBase {
 
     updatePoseEstimator();
 
+    if (!isAllianceReset && DriverStation.getAlliance().isPresent()) {
+     
+      Translation2d posPose = this.getPoseEstimator().getTranslation();
+      robotState.resetPose(getGyroAngle(),
+          this.getModulePositions(),
+          new Pose2d(posPose,
+              new Rotation2d(DriverStation.getAlliance().get() == Alliance.Blue ? 0.0 : Math.PI)));
+
+      isAllianceReset = true;
+    }
+
     if (!allianceSeedHeading && countLL < 100 && !DriverStation.isEnabled()) {
-      SeedHeadingAlliance();
+      SeedHeadingCamera();
       ++countLL;
     }
 
@@ -182,7 +195,7 @@ public class SwerveSubsystem extends SubsystemBase {
    * 
    * @return botpose Yaw from limelight
    */
-  public void SeedHeadingAlliance() {
+  public void SeedHeadingCamera() {
     List<VisionCamera> cameras = VisionSubsystem.getInstance().getCameras();
 
     VisionCamera mainCamera = cameras.stream()
