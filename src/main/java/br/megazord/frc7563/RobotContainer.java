@@ -4,13 +4,9 @@
 
 package br.megazord.frc7563;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import br.megazord.frc7563.Constants.DriveConstants;
 import br.megazord.frc7563.Constants.OIConstants;
 import br.megazord.frc7563.Constants.RobotConstants;
-import br.megazord.frc7563.Constants.VisionConstants;
 import br.megazord.frc7563.subsystems.LedSubsystem;
 import br.megazord.frc7563.subsystems.swerve.Gyro;
 import br.megazord.frc7563.subsystems.swerve.GyroIOPygeon2;
@@ -19,10 +15,7 @@ import br.megazord.frc7563.subsystems.swerve.SwerveModule;
 import br.megazord.frc7563.subsystems.swerve.SwerveModuleIOSim;
 import br.megazord.frc7563.subsystems.swerve.SwerveModuleIOTalonFx;
 import br.megazord.frc7563.subsystems.swerve.SwerveSubsystem;
-import br.megazord.frc7563.subsystems.vision.VisionCamera;
-import br.megazord.frc7563.subsystems.vision.VisionIOLimelight;
-import br.megazord.frc7563.subsystems.vision.VisionIOLimelight.AllianceOrigin;
-import br.megazord.frc7563.subsystems.vision.VisionIOSim;
+import br.megazord.frc7563.subsystems.vision.VisionBuild;
 import br.megazord.frc7563.subsystems.vision.VisionSubsystem;
 import edu.wpi.first.math.MathUtil;
 // Wpilib imports
@@ -69,7 +62,7 @@ public class RobotContainer {
         visionSubsystem.initialize(
             swerveDrive::getGyroAngle,
             swerveDrive::getAngularVelocity,
-            buildSimCameras());
+            VisionBuild.buildSimCameras());
         break;
       case REAL:
         swerveDrive =
@@ -110,7 +103,7 @@ public class RobotContainer {
         visionSubsystem.initialize(
             swerveDrive::getGyroAngle,
             swerveDrive::getAngularVelocity,
-            buildRealCameras());
+            VisionBuild.buildRealCameras());
       default:
         break;
     }
@@ -127,31 +120,6 @@ public class RobotContainer {
     );
     
     configureBindings();
-  }
-
-  /**
-   * Builds one {@link VisionCamera} per configured Limelight in {@link VisionConstants#kCameras},
-   * backed by a real {@link VisionIOLimelight} each.
-   */
-  private List<VisionCamera> buildRealCameras() {
-    List<VisionCamera> result = new ArrayList<>();
-    for (VisionConstants.CameraConfig config : VisionConstants.kCameras) {
-      result.add(new VisionCamera(new VisionIOLimelight(config, AllianceOrigin.BLUE), config.name()));
-    }
-    return result;
-  }
-
-  /**
-   * Builds one {@link VisionCamera} per configured Limelight in {@link VisionConstants#kCameras},
-   * backed by a no-op {@link VisionIOSim} each - keeps the camera count/names identical between
-   * SIM and REAL without simulating any hardware.
-   */
-  private List<VisionCamera> buildSimCameras() {
-    List<VisionCamera> result = new ArrayList<>();
-    for (VisionConstants.CameraConfig config : VisionConstants.kCameras) {
-      result.add(new VisionCamera(new VisionIOSim(), config.name()));
-    }
-    return result;
   }
 
   /**

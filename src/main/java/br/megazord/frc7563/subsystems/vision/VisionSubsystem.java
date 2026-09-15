@@ -52,7 +52,6 @@ public class VisionSubsystem extends SubsystemBase {
   private boolean initialized = false;
 
   private final RobotState robotState = RobotState.getInstance();
-  private int seedReadingsRemaining = VisionConstants.kSeedReadingCount;
 
   private VisionSubsystem() {
   }
@@ -124,8 +123,6 @@ public class VisionSubsystem extends SubsystemBase {
     } catch (Exception e) {
       DriverStation.reportError("Failed to process vision cameras", e.getStackTrace());
     }
-
-    trySeedPose();
   }
 
   /**
@@ -142,31 +139,6 @@ public class VisionSubsystem extends SubsystemBase {
             && c.getGlobalAvgTagDistanceMeters() < VisionConstants.kBestPoseMaxTagDistanceMeters)
         .max(Comparator.comparingDouble(VisionCamera::getGlobalAvgTagAreaPercent))
         .orElse(null);
-  }
-
-  /**
-   * For the first {@code VisionConstants.kSeedReadingCount} good MT1 (gyro-independent) reads
-   * after code start, snaps the pose estimator hard to vision instead of gently blending it in -
-   * this is what lets the robot boot up already knowing roughly where it is, instead of starting
-   * at (0,0,0) and drifting into correctness over several seconds. Stops permanently once used
-   * up, the same way the old setup's boot-time seeding window closed after ~1s.
-   */
-  private void trySeedPose() {
-    if (seedReadingsRemaining <= 0) {
-      return;
-    }
-
-    for (VisionCamera camera : cameras) {
-      if (camera.hasSeedPose() && camera.getSeedTagCount() >= VisionConstants.kSeedTagCountRequired) {
-        robotState.addVisionObservation(
-            camera.getSeedPose(),
-            camera.getSeedPoseTimestampSeconds(),
-            VecBuilder.fill(VisionConstants.kSeedXyStdDev, VisionConstants.kSeedXyStdDev,
-                VisionConstants.kSeedThetaStdDev));
-        seedReadingsRemaining--;
-        return;
-      }
-    }
   }
 
   /**

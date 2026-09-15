@@ -4,6 +4,8 @@
 
 package br.megazord.frc7563.subsystems.swerve;
 
+import java.util.Comparator;
+import java.util.List;
 import java.util.Set;
 import java.util.function.Supplier;
 
@@ -13,7 +15,10 @@ import br.megazord.frc7563.Constants.DriveConstants;
 import br.megazord.frc7563.Constants.DriveConstants.DriveMode;
 import br.megazord.frc7563.Constants.PathPlannerConstants;
 import br.megazord.frc7563.Constants.RobotConstants;
+import br.megazord.frc7563.Constants.VisionConstants;
 import br.megazord.frc7563.RobotState;
+import br.megazord.frc7563.subsystems.vision.VisionCamera;
+import br.megazord.frc7563.subsystems.vision.VisionSubsystem;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -52,6 +57,10 @@ public class SwerveSubsystem extends SubsystemBase {
 
   private DriveMode driveMode = DriveMode.SLOW;
 
+  /** Limelight seed */
+  private boolean allianceSeedHeading = false;
+  private double countLL = 0;
+
   private final SlewRateLimiter xLimiter = new SlewRateLimiter(DriveConstants.kTeleDriveMaxAccelerationUnitsPerSecond);
   private final SlewRateLimiter yLimiter = new SlewRateLimiter(DriveConstants.kTeleDriveMaxAccelerationUnitsPerSecond);
   private final SlewRateLimiter turningLimiter = new SlewRateLimiter(
@@ -59,7 +68,8 @@ public class SwerveSubsystem extends SubsystemBase {
 
   // PathPlanner Config
   private RobotConfig config;
-  private Alert pathPlannerNotInitialized = new Alert("PathPlanner has an initialize error! Please restart RobotCode!", AlertType.kError);
+  private Alert pathPlannerNotInitialized = new Alert("PathPlanner has an initialize error! Please restart RobotCode!",
+      AlertType.kError);
 
   /**
    * Private constructor for the SwerveSubsystem singleton.
@@ -156,7 +166,37 @@ public class SwerveSubsystem extends SubsystemBase {
 
     updatePoseEstimator();
 
+    if (!allianceSeedHeading && countLL < 100 && !DriverStation.isEnabled()) {
+      SeedHeadingAlliance();
+      ++countLL;
+    }
+
     robotState.setMeasuredChassisSpeeds(getChassisSpeeds());
+  }
+
+  /**
+   * Seeds the gyro yaw with the yaw from the Limelight botpose, adjusted for
+   * alliance color.
+   * 
+   * Do NOT TOUCH in this function. Unless you know what you are doing
+   * 
+   * @return botpose Yaw from limelight
+   */
+  public void SeedHeadingAlliance() {
+    List<VisionCamera> cameras = VisionSubsystem.getInstance().getCameras();
+
+    VisionCamera mainCamera = cameras.stream()
+        .filter(VisionCamera::hasSeedPose)
+        .filter(c -> c.getSeedTagCount() > 0
+            && c.getGlobalAvgTagDistanceMeters() < VisionConstants.kBestPoseMaxTagDistanceMeters)
+        .max(Comparator.comparingDouble(VisionCamera::getSeedTagCount))
+        .orElse(null);
+
+    if (mainCamera == null)
+      return;
+
+    gyro.setPosition(mainCamera.getSeedPose().getRotation());
+    updatePoseEstimator();
   }
 
   public void setDriveMode(DriveMode mode) {
@@ -373,7 +413,7 @@ public class SwerveSubsystem extends SubsystemBase {
    */
   public void resetOdometry(Pose2d pose) {
     robotState.resetPose(getGyroAngle(),
-        this.getModulePositions(), 
+        this.getModulePositions(),
         pose);
   }
 
@@ -386,7 +426,7 @@ public class SwerveSubsystem extends SubsystemBase {
     return robotState.getEstimatedPose();
   }
 
-   /**
+  /**
    * Pathfinds to a specific pose using PathPlanner.
    * 
    * @param poseSupplier The supplier that provides the target pose.
@@ -442,8 +482,7 @@ public class SwerveSubsystem extends SubsystemBase {
    * @param pathName
    * @return selected path command
    */
-  public Command followPath(String path)
-  {
+  public Command followPath(String path) {
     // Clear any existing feedback overrides
     PathPlannerPath.clearCache();
     PPHolonomicDriveController.clearXYFeedbackOverride();
