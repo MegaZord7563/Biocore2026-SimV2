@@ -15,8 +15,6 @@ import br.megazord.frc7563.subsystems.swerve.SwerveModule;
 import br.megazord.frc7563.subsystems.swerve.SwerveModuleIOSim;
 import br.megazord.frc7563.subsystems.swerve.SwerveModuleIOTalonFx;
 import br.megazord.frc7563.subsystems.swerve.SwerveSubsystem;
-import br.megazord.frc7563.subsystems.vision.VisionBuild;
-import br.megazord.frc7563.subsystems.vision.VisionSubsystem;
 import edu.wpi.first.math.MathUtil;
 // Wpilib imports
 import edu.wpi.first.wpilibj2.command.Command;
@@ -37,7 +35,6 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 public class RobotContainer {
   // Subsystems instance
   private SwerveSubsystem swerveDrive;
-  private VisionSubsystem visionSubsystem;
   public static LedSubsystem ledSubsystem;
 
   //controllers intace
@@ -47,8 +44,6 @@ public class RobotContainer {
    * The container for the robot. Contains subsystems, OI devices, and commands.
    */
   public RobotContainer() {
-    visionSubsystem = VisionSubsystem.getInstance();
-
     switch (RobotConstants.robotMode) {
       case SIM:
         swerveDrive =
@@ -58,12 +53,8 @@ public class RobotContainer {
                   new SwerveModule(new SwerveModuleIOSim(), "BL"),
                   new SwerveModule(new SwerveModuleIOSim(), "BR"),
                   new Gyro(new GyroIOSim(()-> swerveDrive.getAngularVelocity())));
-
-        visionSubsystem.initialize(
-            swerveDrive::getGyroAngle,
-            swerveDrive::getAngularVelocity,
-            VisionBuild.buildSimCameras());
         break;
+
       case REAL:
         swerveDrive =
               new SwerveSubsystem(
@@ -99,11 +90,8 @@ public class RobotContainer {
                   ), 
                   "BR"),
                   new Gyro(new GyroIOPygeon2()));
+        break;
 
-        visionSubsystem.initialize(
-            swerveDrive::getGyroAngle,
-            swerveDrive::getAngularVelocity,
-            VisionBuild.buildRealCameras());
       default:
         break;
     }

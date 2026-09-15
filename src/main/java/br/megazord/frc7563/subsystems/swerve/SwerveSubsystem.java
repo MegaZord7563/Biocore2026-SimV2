@@ -6,8 +6,10 @@ package br.megazord.frc7563.subsystems.swerve;
 
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 import org.littletonrobotics.junction.AutoLogOutput;
 
@@ -15,10 +17,10 @@ import br.megazord.frc7563.Constants.DriveConstants;
 import br.megazord.frc7563.Constants.DriveConstants.DriveMode;
 import br.megazord.frc7563.Constants.PathPlannerConstants;
 import br.megazord.frc7563.Constants.RobotConstants;
-import br.megazord.frc7563.Constants.VisionConstants;
 import br.megazord.frc7563.RobotState;
-import br.megazord.frc7563.subsystems.vision.VisionCamera;
-import br.megazord.frc7563.subsystems.vision.VisionSubsystem;
+import br.megazord.frc7563.util.LimelightHelpers;
+import edu.wpi.first.math.Matrix;
+import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -27,6 +29,8 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.math.numbers.N1;
+import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
@@ -63,6 +67,11 @@ public class SwerveSubsystem extends SubsystemBase {
   private boolean allianceSeedHeading = false;
   private double countLL = 0;
 
+  List<String> cameras = List.of(
+      DriveConstants.limelightBack,
+      DriveConstants.limelightRight,
+      DriveConstants.limelightLeft);
+
   private final SlewRateLimiter xLimiter = new SlewRateLimiter(DriveConstants.kTeleDriveMaxAccelerationUnitsPerSecond);
   private final SlewRateLimiter yLimiter = new SlewRateLimiter(DriveConstants.kTeleDriveMaxAccelerationUnitsPerSecond);
   private final SlewRateLimiter turningLimiter = new SlewRateLimiter(
@@ -72,6 +81,9 @@ public class SwerveSubsystem extends SubsystemBase {
   private RobotConfig config;
   private Alert pathPlannerNotInitialized = new Alert("PathPlanner has an initialize error! Please restart RobotCode!",
       AlertType.kError);
+
+  // Define the vision measurement standard deviations
+  private static final Matrix<N3, N1> visionPoseStdDevs = VecBuilder.fill(0.7, 0.7, 9999999);
 
   /**
    * Private constructor for the SwerveSubsystem singleton.
@@ -166,10 +178,11 @@ public class SwerveSubsystem extends SubsystemBase {
     getModuleStates();
     getModulePositions();
 
+    addPoseVision();
     updatePoseEstimator();
 
     if (!isAllianceReset && DriverStation.getAlliance().isPresent()) {
-     
+
       Translation2d posPose = this.getPoseEstimator().getTranslation();
       robotState.resetPose(getGyroAngle(),
           this.getModulePositions(),
@@ -196,20 +209,28 @@ public class SwerveSubsystem extends SubsystemBase {
    * @return botpose Yaw from limelight
    */
   public void SeedHeadingCamera() {
-    List<VisionCamera> cameras = VisionSubsystem.getInstance().getCameras();
+    boolean validTargetLeft = LimelightHelpers.getTV(DriveConstants.limelightLeft);
+    boolean validTargetRight = LimelightHelpers.getTV(DriveConstants.limelightRight);
 
-    VisionCamera mainCamera = cameras.stream()
-        .filter(VisionCamera::hasSeedPose)
-        .filter(c -> c.getSeedTagCount() > 0
-            && c.getGlobalAvgTagDistanceMeters() < VisionConstants.kBestPoseMaxTagDistanceMeters)
-        .max(Comparator.comparingDouble(VisionCamera::getSeedTagCount))
-        .orElse(null);
+    if (validTargetLeft || validTargetRight) {
+      // Double rz = LimelightHelpers.getBotPose_wpiBlue(validTargetLeft ?
+      // DriveConstants.limelightBack : DriveConstants.limelightRight)[5];
 
-    if (mainCamera == null)
-      return;
+      // gyro.setYaw(rz.plus(new Rotation2d(DriverStation.getAlliance().get() ==
+      // Alliance.Blue ? 0.0 : Math.PI)).getDegrees());
 
-    gyro.setPosition(mainCamera.getSeedPose().getRotation());
-    updatePoseEstimator();
+      if (DriverStation.getAlliance().get() == Alliance.Blue) {
+        Double rz = LimelightHelpers
+            .getBotPose_wpiBlue(validTargetLeft ? DriveConstants.limelightLeft : DriveConstants.limelightRight)[5];
+        System.out.println(validTargetLeft);
+        gyro.setPosition(Rotation2d.fromDegrees(rz));
+      } else {
+        Double rz = LimelightHelpers
+            .getBotPose_wpiRed(validTargetLeft ? DriveConstants.limelightLeft : DriveConstants.limelightRight)[5];
+        gyro.setPosition(Rotation2d.fromDegrees(rz));
+        System.out.println(rz);
+      }
+    }
   }
 
   public void setDriveMode(DriveMode mode) {
@@ -416,6 +437,50 @@ public class SwerveSubsystem extends SubsystemBase {
     robotState.addOdometryObservation(getGyroAngle(),
         this.getModulePositions()// MNL 10/03/2025
     );
+  }
+
+  public void addPoseVision() {
+    boolean doRejectUpdate = false;
+
+    try {
+      // Set robot orientation for all cameras
+      double robotRotationDegrees = getPoseEstimator().getRotation().getDegrees();
+      for (String camera : cameras) {
+        LimelightHelpers.SetRobotOrientation(camera, robotRotationDegrees, 0, 0, 0, 0, 0);
+      }
+
+      // Get pose estimates for all cameras
+      List<LimelightHelpers.PoseEstimate> poseEstimates = cameras.stream()
+          .map(LimelightHelpers::getBotPoseEstimate_wpiBlue_MegaTag2)
+          .filter(Objects::nonNull) // Filter out null estimates
+          .collect(Collectors.toList());
+
+      // Reject vision updates if angular velocity is too high
+      if (Math.abs(getAngularVelocity().getDegrees()) > 720) {
+        doRejectUpdate = true;
+      }
+
+      // Reject updates if no valid measurements are available
+      if (poseEstimates.isEmpty() || doRejectUpdate) {
+        doRejectUpdate = true;
+      }
+
+      if (!doRejectUpdate) {
+        // Select the best measurement based on tag count, distance, and area
+        LimelightHelpers.PoseEstimate bestMeasurement = poseEstimates.stream()
+            .filter(p -> p.tagCount > 0 && p.avgTagDist < 3.5) // Valid measurements
+            .max(Comparator.comparingDouble(p -> p.avgTagArea)) // Select the one with the largest tag area
+            .orElse(null);
+
+        if (bestMeasurement != null) {
+          // Add the best measurement to the pose estimator
+          robotState.addVisionObservation(bestMeasurement.pose, bestMeasurement.timestampSeconds, visionPoseStdDevs);
+        }
+      }
+    } catch (Exception e) {
+      // Handle exception as needed
+      DriverStation.reportError("Failed to get Limelight botpose", e.getStackTrace());
+    }
   }
 
   /*
