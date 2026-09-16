@@ -95,21 +95,12 @@ public class Robot extends LoggedRobot {
     String logPath = "/U/logs/";
     String logName;
 
-    if (DriverStation.isFMSAttached()) {
       Logger.recordMetadata("Mode", "FMS");
 
       Logger.recordMetadata("Event", DriverStation.getEventName());
       Logger.recordMetadata("MatchType", DriverStation.getMatchType().toString());
       Logger.recordMetadata("MatchNumber", Integer.toString(DriverStation.getMatchNumber()));
       Logger.recordMetadata("Alliance", DriverStation.getAlliance().toString());
-
-      logName = String.format(
-          "%s_%d_%s.wpilog",
-          DriverStation.getMatchType().toString(),
-          DriverStation.getMatchNumber(),
-          DriverStation.getAlliance().toString());
-
-    } else {
       Logger.recordMetadata("Mode", "TEST");
 
       String timestamp = java.time.LocalDateTime.now().toString().replace(":", "-");
@@ -117,19 +108,12 @@ public class Robot extends LoggedRobot {
       Logger.recordMetadata("RunTime", timestamp);
 
       logName = "TEST_" + timestamp + ".wpilog";
-    }
-
-    if (new java.io.File("/U").exists()) {
-      logPath = "/U/logs/";
-    } else {
-      logPath = "/home/lvuser/logs/";
-    }
 
     switch (RobotConstants.robotMode) {
       case REAL:
         // Running on a real robot, log to a USB stick ("/U/logs")
         Logger.addDataReceiver(new WPILOGWriter(logPath + logName));
-        // Logger.addDataReceiver(new NT4Publisher());
+        Logger.addDataReceiver(new NT4Publisher());
         break;
 
       case SIM:

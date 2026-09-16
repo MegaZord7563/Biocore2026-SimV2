@@ -56,11 +56,11 @@ public class SwerveModule {
     public void setDesiredState(SwerveModuleState state) {
         desiredState = state;
 
-        SwerveModuleState correctState = new SwerveModuleState(state.speedMetersPerSecond, state.angle);
+        SwerveModuleState correctState = new SwerveModuleState(state.speedMetersPerSecond, state.angle.plus(Rotation2d.fromRadians(inputs.chassisAngularOffset)));
 
         correctState.optimize(inputs.turnPositionRads);
         correctState.cosineScale(inputs.turnPositionRads);
-        correctState.angle = correctState.angle.plus(Rotation2d.fromRadians(inputs.chassisAngularOffset));
+        correctState.angle = correctState.angle;
 
         outputs.mode = SwerveModuleIOOutputMode.DRIVE;
         double speedRotationsPerSecond = SwerveConversions
@@ -117,12 +117,14 @@ public class SwerveModule {
 
     /** Returns the module position (turn angle and drive position). */
     public SwerveModulePosition getPosition() {
-        return new SwerveModulePosition(getPositionMeters(), getAngle().minus(Rotation2d.fromRadians(inputs.chassisAngularOffset)));
+        return new SwerveModulePosition(getPositionMeters(),
+                getAngle().minus(Rotation2d.fromRadians(inputs.chassisAngularOffset)));
     }
 
     /** Returns the module state (turn angle and drive velocity). */
     public SwerveModuleState getState() {
-        return new SwerveModuleState(getVelocityMetersPerSec(), getAngle().minus(Rotation2d.fromRadians(inputs.chassisAngularOffset)));
+        return new SwerveModuleState(getVelocityMetersPerSec(),
+                getAngle().minus(Rotation2d.fromRadians(inputs.chassisAngularOffset)));
     }
 
     /** Returns the module position in radians. */
