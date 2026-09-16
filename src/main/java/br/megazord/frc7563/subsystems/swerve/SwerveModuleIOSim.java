@@ -26,7 +26,7 @@ public class SwerveModuleIOSim implements SwerveModuleIO {
             LinearSystemId.createDCMotorSystem(driveMotorModel, 0.025, ModuleConstants.kDriveMotorGearRatio),
             driveMotorModel);
 
-    private static final DCMotorSim turnMotor = new DCMotorSim(
+    private final DCMotorSim turnMotor = new DCMotorSim(
             LinearSystemId.createDCMotorSystem(turnMotorModel, 0.004, ModuleConstants.kTurningMotorGearRatio),
             turnMotorModel);
 
@@ -73,11 +73,15 @@ public class SwerveModuleIOSim implements SwerveModuleIO {
         inputs.driveVelocityRadsPerSec = driveMotor.getAngularVelocityRadPerSec();
         inputs.driveAppliedVolts = driveAppliedVolts;
         inputs.driveSupplyCurrentAmps = Math.abs(driveMotor.getCurrentDrawAmps());
+        inputs.driveTempCelsius = 0.0;
 
         inputs.turnConnected = true;
         inputs.turnPositionRads = new Rotation2d(turnMotor.getAngularPositionRad());
         inputs.turnAbsolutePositionRads = new Rotation2d(turnMotor.getAngularPositionRad());
+        inputs.turnTempCelsius = 0.0;
+        inputs.turnAppliedVolts = turnAppliedVolts;
         inputs.turnSupplyCurrentAmps = Math.abs(turnMotor.getCurrentDrawAmps());
+        inputs.turnVelocityRadsPerSec = turnMotor.getAngularVelocityRadPerSec();
     }
 
     @Override

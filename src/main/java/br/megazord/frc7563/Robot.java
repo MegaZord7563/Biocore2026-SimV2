@@ -27,9 +27,6 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import br.megazord.frc7563.Constants.RobotConstants;
 import br.megazord.frc7563.build.BuildConstants;
 import br.megazord.frc7563.util.Elastic;
-import br.megazord.frc7563.util.Elastic.Notification;
-import br.megazord.frc7563.util.Elastic.NotificationLevel;
-
 
 /**
  * The methods in this class are called automatically corresponding to each
@@ -55,17 +52,12 @@ public class Robot extends LoggedRobot {
   private final Alert batteryAlert = new Alert(
       "Battery voltage is very low, please replace the battery.",
       AlertType.kWarning);
-
   private Alert driverJoystickAlert = new Alert(
       "DriverJoystick on port 0 is not connected. Please connect the joystick and restart the robot.",
       Alert.AlertType.kWarning);
-  private Boolean lastStateDriverJoystick = false;
-  private Notification driverJoystickNotification = new Notification(NotificationLevel.WARNING, "Driver Joystick Was Disconnected", "Please Connect Again");
-
   private Alert arcadeJoyLeftAlert = new Alert(
       "Mesinha on port 1 is not connected. Please connect and restart the robot.",
       Alert.AlertType.kInfo);
-
   private Alert arcadeJoyRightAlert = new Alert(
       "Mesinha on port 2 is not connected. Please connect and restart the robot.",
       Alert.AlertType.kInfo);
@@ -223,8 +215,6 @@ public class Robot extends LoggedRobot {
     Logger.recordOutput("Robot/MatchTime", DriverStation.getMatchTime());
 
     driverJoystickAlert.set(!m_robotContainer.driverJoystick.isConnected());
-    if(!m_robotContainer.driverJoystick.isConnected() && lastStateDriverJoystick) {Elastic.sendNotification(driverJoystickNotification);}
-    lastStateDriverJoystick = !m_robotContainer.driverJoystick.isConnected();
     // arcadeJoyLeftAlert.set();
     // arcadeJoyRightAlert.set();
   }

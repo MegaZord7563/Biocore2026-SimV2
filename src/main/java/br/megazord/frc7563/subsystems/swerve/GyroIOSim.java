@@ -24,6 +24,7 @@ public class GyroIOSim implements GyroIO
     {
         yaw = yaw.plus(angularVelocity.get().times(RobotConstants.loopPeriodSecs));
         inputs.robotRotation2d = yaw;
+        inputs.connected = false;
     }
 
     @Override
