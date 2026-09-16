@@ -39,8 +39,8 @@ public class SwerveModule {
     }
 
     public void periodic() {
-        io.updateInputs(inputs);
         io.applyOutputs(outputs);
+        io.updateInputs(inputs);
         Logger.processInputs("SwerveDrive/Module" + position, inputs);
 
         driveDisconnectedAlert.set(!inputs.driveConnected && RobotConstants.enableAlerts);
@@ -56,19 +56,17 @@ public class SwerveModule {
     public void setDesiredState(SwerveModuleState state) {
         desiredState = state;
 
-        SwerveModuleState correctState = new SwerveModuleState();
-
-        correctState = state;
+        SwerveModuleState correctState = new SwerveModuleState(state.speedMetersPerSecond, state.angle);
 
         correctState.optimize(inputs.turnPositionRads);
         correctState.cosineScale(inputs.turnPositionRads);
-        correctState.angle.plus(Rotation2d.fromRadians(inputs.chassisAngularOffset));
+        correctState.angle = correctState.angle.plus(Rotation2d.fromRadians(inputs.chassisAngularOffset));
 
         outputs.mode = SwerveModuleIOOutputMode.DRIVE;
         double speedRotationsPerSecond = SwerveConversions
-                .metersPerSecToWheelRotationsPerSec(state.speedMetersPerSecond);
+                .metersPerSecToWheelRotationsPerSec(correctState.speedMetersPerSecond);
         outputs.driveVelocityRadPerSec = Units.rotationsToRadians(speedRotationsPerSecond);
-        outputs.turnRotation = state.angle;
+        outputs.turnRotation = correctState.angle;
     }
 
     public SwerveModuleState getDesiredState() {
@@ -119,12 +117,12 @@ public class SwerveModule {
 
     /** Returns the module position (turn angle and drive position). */
     public SwerveModulePosition getPosition() {
-        return new SwerveModulePosition(getPositionMeters(), getAngle());
+        return new SwerveModulePosition(getPositionMeters(), getAngle().minus(Rotation2d.fromRadians(inputs.chassisAngularOffset)));
     }
 
     /** Returns the module state (turn angle and drive velocity). */
     public SwerveModuleState getState() {
-        return new SwerveModuleState(getVelocityMetersPerSec(), getAngle());
+        return new SwerveModuleState(getVelocityMetersPerSec(), getAngle().minus(Rotation2d.fromRadians(inputs.chassisAngularOffset)));
     }
 
     /** Returns the module position in radians. */
