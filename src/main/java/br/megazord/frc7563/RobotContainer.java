@@ -96,7 +96,7 @@ public class RobotContainer {
         break;
     }
 
-    ledSubsystem = new LedSubsystem(swerveDrive);
+    ledSubsystem = new LedSubsystem(swerveDrive, 0);
 
     swerveDrive.setDefaultCommand(new RunCommand(
         () -> swerveDrive.driveFieldOriented(
