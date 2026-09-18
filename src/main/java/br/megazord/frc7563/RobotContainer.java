@@ -8,6 +8,8 @@ import br.megazord.frc7563.Constants.DriveConstants;
 import br.megazord.frc7563.Constants.OIConstants;
 import br.megazord.frc7563.Constants.RobotConstants;
 import br.megazord.frc7563.subsystems.LedSubsystem;
+import br.megazord.frc7563.subsystems.Flywheel.FlywheelIOSim;
+import br.megazord.frc7563.subsystems.Flywheel.FlywheelSubsystem;
 import br.megazord.frc7563.subsystems.swerve.Gyro;
 import br.megazord.frc7563.subsystems.swerve.GyroIOPygeon2;
 import br.megazord.frc7563.subsystems.swerve.GyroIOSim;
@@ -35,6 +37,7 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 public class RobotContainer {
   // Subsystems instance
   private SwerveSubsystem swerveDrive;
+  private FlywheelSubsystem flywheelSubsystem;
   public static LedSubsystem ledSubsystem;
 
   //controllers intace
@@ -53,6 +56,8 @@ public class RobotContainer {
                   new SwerveModule(new SwerveModuleIOSim(), "BL"),
                   new SwerveModule(new SwerveModuleIOSim(), "BR"),
                   new Gyro(new GyroIOSim(()-> swerveDrive.getAngularVelocity())));
+
+        flywheelSubsystem = new FlywheelSubsystem(new FlywheelIOSim());
         break;
 
       case REAL:
@@ -90,6 +95,7 @@ public class RobotContainer {
                   ), 
                   "BR"),
                   new Gyro(new GyroIOPygeon2()));
+                  flywheelSubsystem = new FlywheelSubsystem(new FlywheelIOSim());
         break;
 
       default:
@@ -133,6 +139,8 @@ public class RobotContainer {
     driverJoystick.leftBumper().and(driverJoystick.rightBumper()).onTrue(new InstantCommand(()-> swerveDrive.setDriveMode(DriveConstants.DriveMode.MAX), swerveDrive));
 
     driverJoystick.start().onTrue(new InstantCommand(()-> swerveDrive.SeedHeadingCamera()).ignoringDisable(true));
+
+    driverJoystick.rightTrigger(0.5).whileTrue(new InstantCommand(()-> flywheelSubsystem.setVelocityModeRadsPerSec(20))).onFalse(new InstantCommand(()-> flywheelSubsystem.setCoastOut()));
   }
 
   /**
