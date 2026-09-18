@@ -671,7 +671,7 @@ public final class Constants {
         public static final double kReverseSoftLimitThreshold = 0;
       }
 
-      public static final class shooterWheelConstants {
+      public static final class FlywheelConstants {
 
         public static final int kFollowerMotorId = 19;
         /* to implement */
@@ -682,7 +682,7 @@ public final class Constants {
 
         public static final boolean kMotorEnableCurrentLimit = true;
         public static final boolean kContinuousWrap = false;
-        public static final double kDriveMotorGearRatio = 1;
+        public static final double kMotorGearRatio = 1;
 
         // *------------PID GAINS--------------------- */
         public static final double kSlot0kS = 0.23121;//0.32743;

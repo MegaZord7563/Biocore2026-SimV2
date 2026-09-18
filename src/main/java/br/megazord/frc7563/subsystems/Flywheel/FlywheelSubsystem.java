@@ -4,14 +4,37 @@
 
 package br.megazord.frc7563.subsystems.Flywheel;
 
+import br.megazord.frc7563.subsystems.Flywheel.FlywheelIO.FlywheelIOOutputs;
+import edu.wpi.first.wpilibj.Alert;
+import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class FlywheelSubsystem extends SubsystemBase {
+  private final FlywheelIO io;
+  private final FlywheelIOInputsAutoLogged inputs = new FlywheelIOInputsAutoLogged();
+  private final FlywheelIOOutputs outputs = new FlywheelIOOutputs();
+
+  private final Alert leaderDisconnectedAlert;
+  private final Alert followerDisconnectedAlert;
+
   /** Creates a new FlywheelSubsystem. */
-  public FlywheelSubsystem() {}
+  public FlywheelSubsystem(FlywheelIO io) {
+    this.io = io;
+
+    leaderDisconnectedAlert = new Alert(
+        "Disconnected leader motor on flywheel",
+        AlertType.kError);
+    followerDisconnectedAlert = new Alert(
+        "Disconnected follower motor on flywheel",
+        AlertType.kError);
+  }
 
   @Override
-  public void periodic() {
-    // This method will be called once per scheduler run
+  public void periodic() 
+  {
+    io.updateInputs(inputs);
+
+    followerDisconnectedAlert.set(!inputs.followerConnected);
+    leaderDisconnectedAlert.set(!inputs.leaderConnected);
   }
 }

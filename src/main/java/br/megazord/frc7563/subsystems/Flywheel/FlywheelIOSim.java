@@ -1,26 +1,81 @@
 package br.megazord.frc7563.subsystems.Flywheel;
 
-import br.megazord.frc7563.Constants.ModuleConstants;
+import br.megazord.frc7563.Constants.RobotConstants;
+import br.megazord.frc7563.Constants.SubsystemsConstants.shooterConstants.FlywheelConstants;
+import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.wpilibj.simulation.DCMotorSim;
 
 public class FlywheelIOSim implements FlywheelIO {
-    private static final DCMotor motorModel = DCMotor.getKrakenX60Foc(1);
+    private static final DCMotor motorModel = DCMotor.getKrakenX60Foc(2);
 
-    private final DCMotorSim leaderMotor = new DCMotorSim(
-            LinearSystemId.createDCMotorSystem(motorModel, 0.025, ModuleConstants.kDriveMotorGearRatio),
+    private final DCMotorSim flywheelMotor = new DCMotorSim(
+            LinearSystemId.createDCMotorSystem(motorModel, 0.025, FlywheelConstants.kMotorGearRatio),
             motorModel);
 
-    private final DCMotorSim followerMotor = new DCMotorSim(
-            LinearSystemId.createDCMotorSystem(motorModel, 0.025, ModuleConstants.kDriveMotorGearRatio),
-            motorModel);
+    private PIDController flywheelPID = new PIDController(FlywheelConstants.kSlot0kP / (2 * Math.PI),
+            FlywheelConstants.kSlot0kI / (2 * Math.PI),
+            FlywheelConstants.kSlot0kD / (2 * Math.PI), RobotConstants.loopPeriodSecs);
+    private SimpleMotorFeedforward flywheelFF = new SimpleMotorFeedforward(FlywheelConstants.kSlot0kS / (2 * Math.PI),
+            FlywheelConstants.kSlot0kV / (2 * Math.PI), 0.0);
+    private double feedForward = 0.0;
 
-    public FlywheelIOSim(){}
+    private boolean cloosedLoop = false;
+    private double appliedVolts = 0.0;
+
+    public FlywheelIOSim() {}
 
     @Override
-    public void updateInputs(FlywheelIOInputs inputs){}
+    public void updateInputs(FlywheelIOInputs inputs) {
+        if (cloosedLoop) {
+            appliedVolts = flywheelPID.calculate(flywheelMotor.getAngularVelocityRadPerSec()) + feedForward;
+        }
+
+        flywheelMotor.update(RobotConstants.loopPeriodSecs);
+        flywheelMotor.setInputVoltage(appliedVolts);
+
+        inputs.leaderConnected = true;
+        inputs.followerConnected = true;
+
+        inputs.leaderAppliedVoltage = appliedVolts;
+        inputs.leaderVelocityRadsPerSec = flywheelMotor.getAngularVelocityRadPerSec();
+        inputs.leaderPositionRads = flywheelMotor.getAngularPositionRad();
+        inputs.leaderSupplyCurrentAmps = flywheelMotor.getCurrentDrawAmps();
+        inputs.leaderTempCelsius = 0.0;
+        inputs.leaderAppliedVoltage = appliedVolts;
+        inputs.leaderVelocityRadsPerSec = flywheelMotor.getAngularVelocityRadPerSec();
+        inputs.leaderPositionRads = flywheelMotor.getAngularPositionRad();
+        inputs.leaderSupplyCurrentAmps = flywheelMotor.getCurrentDrawAmps();
+        inputs.leaderTempCelsius = 0.0;
+    }
 
     @Override
-    public void applyOutputs(FlywheelIOOutputs outputs){}
+    public void applyOutputs(FlywheelIOOutputs outputs) {
+        switch (outputs.mode) {
+            case VOLTAGE:
+                cloosedLoop = false;
+                appliedVolts = outputs.voltage;
+                break;
+            case VELOCITY:
+                cloosedLoop = true;
+                flywheelPID.setSetpoint(outputs.velocityRadsPerSec);
+                flywheelFF.calculate(outputs.velocityRadsPerSec);
+                break;
+            case BRAKE:
+                cloosedLoop = false;
+                appliedVolts = 0.0;
+                break;
+            case COAST:
+                cloosedLoop = false;
+                appliedVolts = 0.0;
+                break;
+            case CHARACTERIZE:
+                cloosedLoop = false;
+                break;
+            default:
+                break;
+        }
+    }
 }

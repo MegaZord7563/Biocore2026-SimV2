@@ -20,10 +20,9 @@ public interface FlywheelIO {
         public double leaderTempCelsius = 0.0;
 
         public boolean followerConnected = false;
+        public double followerAppliedVoltage = 0.0;
         public double followerPositionRads = 0.0;
         public double followerVelocityRadsPerSec = 0.0;
-        public double followerAppliedVoltage = 0.0;
-        public double followerSupplyVoltage = 0.0;
         public double followerSupplyCurrentAmps = 0.0;
         public double followerTempCelsius = 0.0;
     }
@@ -40,7 +39,7 @@ public interface FlywheelIO {
         public FlywheelIOOutputMode mode = FlywheelIOOutputMode.COAST;
         public double velocityRadsPerSec = 0.0;
         public double voltage = 0.0;
-
+        public double CharacterizationOutput = 0.0;
     }
 
     public default void updateInputs(FlywheelIOInputs inputs) {}
