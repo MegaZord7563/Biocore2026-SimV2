@@ -4,8 +4,12 @@
 
 package br.megazord.frc7563.subsystems.Flywheel;
 
+import org.littletonrobotics.junction.Logger;
+
+import br.megazord.frc7563.subsystems.Flywheel.FlywheelIO.FlywheelIOOutputMode;
 import br.megazord.frc7563.subsystems.Flywheel.FlywheelIO.FlywheelIOOutputs;
 import edu.wpi.first.wpilibj.Alert;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
@@ -33,8 +37,49 @@ public class FlywheelSubsystem extends SubsystemBase {
   public void periodic() 
   {
     io.updateInputs(inputs);
+    Logger.processInputs("Flywheel", inputs);
+
+    if(DriverStation.isDisabled())
+    {
+      outputs.mode = FlywheelIOOutputMode.COAST;
+      io.applyOutputs(outputs);
+    }
 
     followerDisconnectedAlert.set(!inputs.followerConnected);
     leaderDisconnectedAlert.set(!inputs.leaderConnected);
+  }
+
+  public void setBrakeOut()
+  {
+    outputs.mode = FlywheelIOOutputMode.BRAKE;
+    io.applyOutputs(outputs);
+  }
+
+  public void setCoastOut()
+  {
+    outputs.mode = FlywheelIOOutputMode.COAST;
+    io.applyOutputs(outputs);
+  }
+
+  public void setVelocityModeRadsPerSec(double velocityRadsPerSec)
+  {
+    outputs.mode = FlywheelIOOutputMode.VELOCITY;
+    outputs.velocityRadsPerSec = velocityRadsPerSec;
+    io.applyOutputs(outputs);
+  }
+
+  public double getFlywheelVelocityRadsPerSec()
+  {
+    return inputs.leaderVelocityRadsPerSec;
+  }
+
+  public double getFlywheelSupplyCurrentAmps()
+  {
+    return inputs.leaderSupplyCurrentAmps;
+  }
+
+  public double getFlywheelAppliedVolts()
+  {
+    return inputs.leaderAppliedVoltage;
   }
 }
