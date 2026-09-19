@@ -15,6 +15,7 @@ import br.megazord.frc7563.subsystems.shooter.hood.HoodIOSim;
 import br.megazord.frc7563.subsystems.shooter.hood.HoodIOTalonFX;
 import br.megazord.frc7563.subsystems.shooter.hood.HoodSubsystem;
 import br.megazord.frc7563.subsystems.shooter.turret.TurretIOSim;
+import br.megazord.frc7563.subsystems.shooter.turret.TurretIOTalonFX;
 import br.megazord.frc7563.subsystems.shooter.turret.TurretSubsystem;
 import br.megazord.frc7563.subsystems.swerve.Gyro;
 import br.megazord.frc7563.subsystems.swerve.GyroIOPygeon2;
@@ -107,9 +108,8 @@ public class RobotContainer {
                   "BR"),
                   new Gyro(new GyroIOPygeon2()));
         flywheelSubsystem = new FlywheelSubsystem(new FlywheelIOSim());
-        turretSubsystem = new TurretSubsystem(new TurretIOSim());
+        turretSubsystem = new TurretSubsystem(new TurretIOTalonFX());
         hoodSubsystem = new HoodSubsystem(new HoodIOTalonFX());
-
         break;
 
       default:
