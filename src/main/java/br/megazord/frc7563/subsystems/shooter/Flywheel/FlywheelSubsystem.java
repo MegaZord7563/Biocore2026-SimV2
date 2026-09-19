@@ -2,12 +2,12 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package br.megazord.frc7563.subsystems.Flywheel;
+package br.megazord.frc7563.subsystems.shooter.Flywheel;
 
 import org.littletonrobotics.junction.Logger;
 
-import br.megazord.frc7563.subsystems.Flywheel.FlywheelIO.FlywheelIOOutputMode;
-import br.megazord.frc7563.subsystems.Flywheel.FlywheelIO.FlywheelIOOutputs;
+import br.megazord.frc7563.subsystems.shooter.Flywheel.FlywheelIO.FlywheelIOOutputMode;
+import br.megazord.frc7563.subsystems.shooter.Flywheel.FlywheelIO.FlywheelIOOutputs;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Alert.AlertType;

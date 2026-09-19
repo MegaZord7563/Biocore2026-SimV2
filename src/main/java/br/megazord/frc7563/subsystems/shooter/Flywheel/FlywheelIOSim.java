@@ -1,4 +1,4 @@
-package br.megazord.frc7563.subsystems.Flywheel;
+package br.megazord.frc7563.subsystems.shooter.Flywheel;
 
 import br.megazord.frc7563.Constants.RobotConstants;
 import br.megazord.frc7563.Constants.SubsystemsConstants.shooterConstants.FlywheelConstants;
