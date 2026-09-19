@@ -140,7 +140,7 @@ public class RobotContainer {
 
     driverJoystick.start().onTrue(new InstantCommand(()-> swerveDrive.SeedHeadingCamera()).ignoringDisable(true));
 
-    driverJoystick.rightTrigger(0.5).whileTrue(new InstantCommand(()-> flywheelSubsystem.setVelocityModeRadsPerSec(20))).onFalse(new InstantCommand(()-> flywheelSubsystem.setCoastOut()));
+    driverJoystick.rightTrigger(0.5).whileTrue(new InstantCommand(()-> flywheelSubsystem.setVelocityModeRadsPerSec(60))).onFalse(new InstantCommand(()-> flywheelSubsystem.setCoastOut()));
   }
 
   /**

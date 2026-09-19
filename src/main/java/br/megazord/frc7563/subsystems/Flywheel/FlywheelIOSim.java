@@ -44,11 +44,11 @@ public class FlywheelIOSim implements FlywheelIO {
         inputs.leaderPositionRads = flywheelMotor.getAngularPositionRad();
         inputs.leaderSupplyCurrentAmps = flywheelMotor.getCurrentDrawAmps();
         inputs.leaderTempCelsius = 0.0;
-        inputs.leaderAppliedVoltage = appliedVolts;
-        inputs.leaderVelocityRadsPerSec = flywheelMotor.getAngularVelocityRadPerSec();
-        inputs.leaderPositionRads = flywheelMotor.getAngularPositionRad();
-        inputs.leaderSupplyCurrentAmps = flywheelMotor.getCurrentDrawAmps();
-        inputs.leaderTempCelsius = 0.0;
+        inputs.followerAppliedVoltage = appliedVolts;
+        inputs.followerVelocityRadsPerSec = flywheelMotor.getAngularVelocityRadPerSec();
+        inputs.followerPositionRads = flywheelMotor.getAngularPositionRad();
+        inputs.followerSupplyCurrentAmps = flywheelMotor.getCurrentDrawAmps();
+        inputs.followerTempCelsius = 0.0;
     }
 
     @Override
