@@ -13,10 +13,8 @@ public interface TurretIO {
         public double turretPositionRads = 0.0;
         public double turretVelocityRadsPerSec = 0.0;
         public double turretAppliedVoltage = 0.0;
-        public double turretSupplyVoltage = 0.0;
         public double turretSupplyCurrentAmps = 0.0;
         public double turretTempCelsius = 0.0;
-        public Rotation2d turretRotation2d = Rotation2d.kZero;
     }
 
     public enum TurretIOMode
