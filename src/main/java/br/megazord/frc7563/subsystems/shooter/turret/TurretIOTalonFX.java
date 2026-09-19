@@ -18,7 +18,6 @@ import com.ctre.phoenix6.signals.InvertedValue;
 
 import br.megazord.frc7563.subsystems.shooter.ShooterConstants.Turret;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.DriverStation;
 
 public class TurretIOTalonFX implements TurretIO {
