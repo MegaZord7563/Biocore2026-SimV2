@@ -20,10 +20,7 @@ public class TurretIOSim implements TurretIO {
     private boolean closedLoop = false;
     private double appliedVolts = 0.0;
 
-    public TurretIOSim() 
-    {
-        turretPID.enableContinuousInput(-Math.PI, Math.PI);
-    }
+    public TurretIOSim() {}
 
     @Override
     public void updateInputs(TurretIOInputs inputs) 
