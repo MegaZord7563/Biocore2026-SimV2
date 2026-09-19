@@ -41,7 +41,7 @@ public class SwerveModule {
     public void periodic() {
         io.applyOutputs(outputs);
         io.updateInputs(inputs);
-        Logger.processInputs("SwerveDrive/Module" + position, inputs);
+        Logger.processInputs("Drive/Module" + position, inputs);
 
         driveDisconnectedAlert.set(!inputs.driveConnected && RobotConstants.enableAlerts);
         turnDisconnectedAlert.set(!inputs.turnConnected && RobotConstants.enableAlerts);
