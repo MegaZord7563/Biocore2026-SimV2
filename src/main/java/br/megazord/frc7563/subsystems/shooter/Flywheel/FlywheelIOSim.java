@@ -1,7 +1,7 @@
 package br.megazord.frc7563.subsystems.shooter.Flywheel;
 
 import br.megazord.frc7563.Constants.RobotConstants;
-import br.megazord.frc7563.Constants.SubsystemsConstants.shooterConstants.FlywheelConstants;
+import br.megazord.frc7563.subsystems.shooter.ShooterConstants.Flywheel;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.system.plant.DCMotor;
@@ -12,14 +12,14 @@ public class FlywheelIOSim implements FlywheelIO {
     private static final DCMotor motorModel = DCMotor.getKrakenX60Foc(2);
 
     private final DCMotorSim flywheelMotor = new DCMotorSim(
-            LinearSystemId.createDCMotorSystem(motorModel, 0.03, FlywheelConstants.kMotorGearRatio),
+            LinearSystemId.createDCMotorSystem(motorModel, 0.03, Flywheel.kMotorGearRatio),
             motorModel);
 
-    private PIDController flywheelPID = new PIDController(FlywheelConstants.kSlot0kP / (2 * Math.PI),
-            FlywheelConstants.kSlot0kI / (2 * Math.PI),
-            FlywheelConstants.kSlot0kD / (2 * Math.PI), RobotConstants.loopPeriodSecs);
-    private SimpleMotorFeedforward flywheelFF = new SimpleMotorFeedforward(FlywheelConstants.kSlot0kS / (2 * Math.PI),
-            FlywheelConstants.kSlot0kV / (2 * Math.PI), 0.0);
+    private PIDController flywheelPID = new PIDController(Flywheel.kSlot0kP / (2 * Math.PI),
+            Flywheel.kSlot0kI / (2 * Math.PI),
+            Flywheel.kSlot0kD / (2 * Math.PI), RobotConstants.loopPeriodSecs);
+    private SimpleMotorFeedforward flywheelFF = new SimpleMotorFeedforward(Flywheel.kSlot0kS / (2 * Math.PI),
+            Flywheel.kSlot0kV / (2 * Math.PI), 0.0);
     private double feedForward = 0.0;
 
     private boolean cloosedLoop = false;

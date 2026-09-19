@@ -1,7 +1,7 @@
 package br.megazord.frc7563.subsystems.shooter.hood;
 
 import br.megazord.frc7563.Constants.RobotConstants;
-import br.megazord.frc7563.Constants.SubsystemsConstants.shooterConstants.HoodConstants;
+import br.megazord.frc7563.subsystems.shooter.ShooterConstants.Hood;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.LinearSystemId;
@@ -11,11 +11,11 @@ public class HoodIOSim implements HoodIO {
     private static final DCMotor motorModel = DCMotor.getKrakenX44Foc(1);
 
     private final DCMotorSim hoodMotor = new DCMotorSim(
-            LinearSystemId.createDCMotorSystem(motorModel, 0.1, HoodConstants.kMotorGearRatio),
+            LinearSystemId.createDCMotorSystem(motorModel, 0.1, Hood.kMotorGearRatio),
             motorModel);
 
 
-    private PIDController hoodPID = new PIDController(HoodConstants.kP / (2 * Math.PI), HoodConstants.kI / (2 * Math.PI), HoodConstants.kD /  (2 * Math.PI));
+    private PIDController hoodPID = new PIDController(Hood.kP / (2 * Math.PI), Hood.kI / (2 * Math.PI), Hood.kD /  (2 * Math.PI));
 
     private boolean closedLoop = false;
     private double appliedVolts = 0.0;
