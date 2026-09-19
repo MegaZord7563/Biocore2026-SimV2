@@ -10,6 +10,8 @@ import br.megazord.frc7563.Constants.RobotConstants;
 import br.megazord.frc7563.subsystems.LedSubsystem;
 import br.megazord.frc7563.subsystems.shooter.Flywheel.FlywheelIOSim;
 import br.megazord.frc7563.subsystems.shooter.Flywheel.FlywheelSubsystem;
+import br.megazord.frc7563.subsystems.shooter.turret.TurretIOSim;
+import br.megazord.frc7563.subsystems.shooter.turret.TurretSubsystem;
 import br.megazord.frc7563.subsystems.swerve.Gyro;
 import br.megazord.frc7563.subsystems.swerve.GyroIOPygeon2;
 import br.megazord.frc7563.subsystems.swerve.GyroIOSim;
@@ -18,6 +20,7 @@ import br.megazord.frc7563.subsystems.swerve.SwerveModuleIOSim;
 import br.megazord.frc7563.subsystems.swerve.SwerveModuleIOTalonFx;
 import br.megazord.frc7563.subsystems.swerve.SwerveSubsystem;
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.geometry.Rotation2d;
 // Wpilib imports
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -38,6 +41,7 @@ public class RobotContainer {
   // Subsystems instance
   private SwerveSubsystem swerveDrive;
   private FlywheelSubsystem flywheelSubsystem;
+  private TurretSubsystem turretSubsystem;
   public static LedSubsystem ledSubsystem;
 
   //controllers intace
@@ -58,6 +62,7 @@ public class RobotContainer {
                   new Gyro(new GyroIOSim(()-> swerveDrive.getAngularVelocity())));
 
         flywheelSubsystem = new FlywheelSubsystem(new FlywheelIOSim());
+        turretSubsystem = new TurretSubsystem(new TurretIOSim());
         break;
 
       case REAL:
@@ -96,6 +101,7 @@ public class RobotContainer {
                   "BR"),
                   new Gyro(new GyroIOPygeon2()));
                   flywheelSubsystem = new FlywheelSubsystem(new FlywheelIOSim());
+                  turretSubsystem = new TurretSubsystem(new TurretIOSim());
         break;
 
       default:
@@ -141,6 +147,7 @@ public class RobotContainer {
     driverJoystick.start().onTrue(new InstantCommand(()-> swerveDrive.SeedHeadingCamera()).ignoringDisable(true));
 
     driverJoystick.rightTrigger(0.5).whileTrue(new InstantCommand(()-> flywheelSubsystem.setVelocityModeRadsPerSec(60))).onFalse(new InstantCommand(()-> flywheelSubsystem.setCoastOut()));
+    driverJoystick.a().onTrue(new InstantCommand(()-> turretSubsystem.setTargetRotation(new Rotation2d(Math.PI)))).onFalse(new InstantCommand(()-> turretSubsystem.setTargetRotation(new Rotation2d(0))));
   }
 
   /**
