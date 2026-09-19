@@ -66,6 +66,8 @@ public class FlywheelSubsystem extends SubsystemBase {
     outputs.mode = FlywheelIOOutputMode.VELOCITY;
     outputs.velocityRadsPerSec = velocityRadsPerSec;
     io.applyOutputs(outputs);
+
+    Logger.recordOutput("Flywheel/velocitySetpointRadsPerSec", velocityRadsPerSec);
   }
 
   public double getFlywheelVelocityRadsPerSec()

@@ -12,7 +12,7 @@ public class FlywheelIOSim implements FlywheelIO {
     private static final DCMotor motorModel = DCMotor.getKrakenX60Foc(2);
 
     private final DCMotorSim flywheelMotor = new DCMotorSim(
-            LinearSystemId.createDCMotorSystem(motorModel, 0.025, FlywheelConstants.kMotorGearRatio),
+            LinearSystemId.createDCMotorSystem(motorModel, 0.03, FlywheelConstants.kMotorGearRatio),
             motorModel);
 
     private PIDController flywheelPID = new PIDController(FlywheelConstants.kSlot0kP / (2 * Math.PI),
