@@ -17,7 +17,7 @@ public interface TurretIO {
         public double turretTempCelsius = 0.0;
     }
 
-    public enum TurretIOMode
+    public enum TurretIOOutputsMode
     {
         POSITION,
         VOLTAGE,
@@ -27,7 +27,7 @@ public interface TurretIO {
 
     public class TurretIOOutputs
     {
-        public TurretIOMode mode = TurretIOMode.COAST;
+        public TurretIOOutputsMode mode = TurretIOOutputsMode.COAST;
         public Rotation2d targetRotation = Rotation2d.kZero;
         public double voltageOut = 0.0;
     }

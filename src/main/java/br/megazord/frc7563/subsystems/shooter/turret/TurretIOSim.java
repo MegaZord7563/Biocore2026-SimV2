@@ -31,6 +31,10 @@ public class TurretIOSim implements TurretIO {
         if (closedLoop) {
             appliedVolts = turretPID.calculate(turretMotor.getAngularPositionRad());
         }
+        else
+        {
+            turretPID.reset();
+        }
 
         turretMotor.setInputVoltage(appliedVolts);
         turretMotor.update(RobotConstants.loopPeriodSecs);
