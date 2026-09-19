@@ -1,7 +1,7 @@
 package br.megazord.frc7563.subsystems.shooter.turret;
 
 import br.megazord.frc7563.Constants.RobotConstants;
-import br.megazord.frc7563.Constants.SubsystemsConstants.shooterConstants.TurretConstants;
+import br.megazord.frc7563.subsystems.shooter.ShooterConstants.Turret;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.LinearSystemId;
@@ -11,11 +11,11 @@ public class TurretIOSim implements TurretIO {
     private static final DCMotor motorModel = DCMotor.getKrakenX60Foc(1);
 
     private final DCMotorSim turretMotor = new DCMotorSim(
-            LinearSystemId.createDCMotorSystem(motorModel, 0.1, TurretConstants.kMotorGearRatio),
+            LinearSystemId.createDCMotorSystem(motorModel, 0.1, Turret.kMotorGearRatio),
             motorModel);
 
 
-    private PIDController turretPID = new PIDController(TurretConstants.kP / (2 * Math.PI), TurretConstants.kI / (2 * Math.PI), TurretConstants.kD /  (2 * Math.PI));
+    private PIDController turretPID = new PIDController(Turret.kP / (2 * Math.PI), Turret.kI / (2 * Math.PI), Turret.kD /  (2 * Math.PI));
 
     private boolean closedLoop = false;
     private double appliedVolts = 0.0;
