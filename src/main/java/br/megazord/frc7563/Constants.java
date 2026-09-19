@@ -640,12 +640,12 @@ public final class Constants {
 
       }
 
-      public static final class CapoArticulatorConstants 
+      public static final class HoodConstants 
       {
         /* to implement */
         /* motors infos */
 
-        public static final int kCapoArticulatorMotorId = 18;
+        public static final int kHoodArticulatorMotorId = 18;
         public static final NeutralModeValue kMotorNeutalMode = NeutralModeValue.Coast;
         public static final MotorType kMotorType = MotorType.kBrushless;
 
@@ -654,7 +654,7 @@ public final class Constants {
         public static final boolean kMotorEnableCurrentLimit = true;
 
         /* feedback sensor */
-        public static final double kDriveMotorGearRatio = 2.833;
+        public static final double kMotorGearRatio = 2.833;
         public static final boolean kContinuousWrap = false;
 
         /* -----------PID constants-------------------- */

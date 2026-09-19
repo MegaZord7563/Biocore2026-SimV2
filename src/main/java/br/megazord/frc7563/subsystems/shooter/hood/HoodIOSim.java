@@ -1,20 +1,75 @@
-// Copyright (c) FIRST and other WPILib contributors.
-// Open Source Software; you can modify and/or share it under the terms of
-// the WPILib BSD license file in the root directory of this project.
-
 package br.megazord.frc7563.subsystems.shooter.hood;
 
-/** Add your docs here. */
-public class HoodIOSim implements HoodIO 
-{
-    public HoodIOSim()
-    {
+import br.megazord.frc7563.Constants.RobotConstants;
+import br.megazord.frc7563.Constants.SubsystemsConstants.shooterConstants.HoodConstants;
+import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.math.system.plant.LinearSystemId;
+import edu.wpi.first.wpilibj.simulation.DCMotorSim;
 
+public class HoodIOSim implements HoodIO {
+    private static final DCMotor motorModel = DCMotor.getKrakenX44Foc(1);
+
+    private final DCMotorSim hoodMotor = new DCMotorSim(
+            LinearSystemId.createDCMotorSystem(motorModel, 0.1, HoodConstants.kMotorGearRatio),
+            motorModel);
+
+
+    private PIDController hoodPID = new PIDController(HoodConstants.kP / (2 * Math.PI), HoodConstants.kI / (2 * Math.PI), HoodConstants.kD /  (2 * Math.PI));
+
+    private boolean closedLoop = false;
+    private double appliedVolts = 0.0;
+
+    public HoodIOSim() {}
+
+    @Override
+    public void updateInputs(HoodIOInputs inputs) 
+    {
+        if (closedLoop) {
+            appliedVolts = hoodPID.calculate(hoodMotor.getAngularPositionRad());
+        }
+        else
+        {
+            hoodPID.reset();
+        }
+
+        hoodMotor.setInputVoltage(appliedVolts);
+        hoodMotor.update(RobotConstants.loopPeriodSecs);
+
+        inputs.turretConnected = true;
+        inputs.turretPositionRads = hoodMotor.getAngularPositionRad();
+        inputs.turretVelocityRadsPerSec = hoodMotor.getAngularVelocityRadPerSec();
+        inputs.turretAppliedVoltage = appliedVolts;
+        inputs.turretSupplyCurrentAmps = hoodMotor.getCurrentDrawAmps();
+        inputs.turretTempCelsius = 0.0;
     }
 
-    @Override
-    public void updateInputs(HoodIOInputs inputs) {}
+    @Override 
+    public void applyOutputs(HoodIOOutputs outputs) 
+    {
+        switch (outputs.mode) {
+            case POSITION:
+                hoodPID.setSetpoint(outputs.targetPositionRads);
+                closedLoop = true;
+                break;
 
-    @Override
-    public void applyOutputs(HoodIOOutputs outputs) {}
+            case VOLTAGE:
+                appliedVolts = outputs.voltageOut;
+                closedLoop = false;
+                break;
+
+            case BREAK:
+                appliedVolts = 0.0;
+                closedLoop = false;
+                break;
+
+            case COAST:
+                appliedVolts = 0.0;
+                closedLoop = false;
+                break;
+        
+            default:
+                break;
+        }
+    }
 }
