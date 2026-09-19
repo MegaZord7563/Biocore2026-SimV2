@@ -7,12 +7,12 @@ public interface HoodIO {
     @AutoLog
     public class HoodIOInputs
     {
-        public boolean turretConnected = false;
-        public double turretPositionRads = 0.0;
-        public double turretVelocityRadsPerSec = 0.0;
-        public double turretAppliedVoltage = 0.0;
-        public double turretSupplyCurrentAmps = 0.0;
-        public double turretTempCelsius = 0.0;
+        public boolean hoodConnected = false;
+        public double hoodPositionRads = 0.0;
+        public double hoodVelocityRadsPerSec = 0.0;
+        public double hoodAppliedVoltage = 0.0;
+        public double hoodSupplyCurrentAmps = 0.0;
+        public double hoodTempCelsius = 0.0;
     }
 
     public enum HoodIOOutputsMode

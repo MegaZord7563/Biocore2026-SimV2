@@ -36,12 +36,12 @@ public class HoodIOSim implements HoodIO {
         hoodMotor.setInputVoltage(appliedVolts);
         hoodMotor.update(RobotConstants.loopPeriodSecs);
 
-        inputs.turretConnected = true;
-        inputs.turretPositionRads = hoodMotor.getAngularPositionRad();
-        inputs.turretVelocityRadsPerSec = hoodMotor.getAngularVelocityRadPerSec();
-        inputs.turretAppliedVoltage = appliedVolts;
-        inputs.turretSupplyCurrentAmps = hoodMotor.getCurrentDrawAmps();
-        inputs.turretTempCelsius = 0.0;
+        inputs.hoodConnected = true;
+        inputs.hoodPositionRads = hoodMotor.getAngularPositionRad();
+        inputs.hoodVelocityRadsPerSec = hoodMotor.getAngularVelocityRadPerSec();
+        inputs.hoodAppliedVoltage = appliedVolts;
+        inputs.hoodSupplyCurrentAmps = hoodMotor.getCurrentDrawAmps();
+        inputs.hoodTempCelsius = 0.0;
     }
 
     @Override 
