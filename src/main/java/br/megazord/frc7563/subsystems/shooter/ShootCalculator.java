@@ -19,6 +19,7 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 import br.megazord.frc7563.RobotState;
+import br.megazord.frc7563.Constants.RobotConstants;
 import br.megazord.frc7563.subsystems.shooter.ShooterConstants.Calculator;
 import br.megazord.frc7563.subsystems.shooter.ShooterConstants.Field;
 import br.megazord.frc7563.subsystems.shooter.ShooterConstants.Geometry;
@@ -127,7 +128,7 @@ public class ShootCalculator {
       futurePose = new Pose2d(
           robotPose.getTranslation().plus(robotDisplacement),
           robotPose.getRotation().plus(
-              Rotation2d.fromRadians(fieldSpeeds.omegaRadiansPerSecond * (timeOfFlight + 0.003))));
+              Rotation2d.fromRadians(fieldSpeeds.omegaRadiansPerSecond * (timeOfFlight + RobotConstants.loopPeriodSecs)))); // Tof + Latency
 
       // Turret offset applied in the same frame as the distance calculation.
       turretPose = futurePose.transformBy(Geometry.kRobotToTurret2d);
