@@ -10,6 +10,8 @@ import br.megazord.frc7563.Constants.RobotConstants;
 import br.megazord.frc7563.subsystems.LedSubsystem;
 import br.megazord.frc7563.subsystems.shooter.Flywheel.FlywheelIOSim;
 import br.megazord.frc7563.subsystems.shooter.Flywheel.FlywheelSubsystem;
+import br.megazord.frc7563.subsystems.shooter.hood.HoodIOSim;
+import br.megazord.frc7563.subsystems.shooter.hood.HoodSubsystem;
 import br.megazord.frc7563.subsystems.shooter.turret.TurretIOSim;
 import br.megazord.frc7563.subsystems.shooter.turret.TurretSubsystem;
 import br.megazord.frc7563.subsystems.swerve.Gyro;
@@ -42,6 +44,7 @@ public class RobotContainer {
   private SwerveSubsystem swerveDrive;
   private FlywheelSubsystem flywheelSubsystem;
   private TurretSubsystem turretSubsystem;
+  private HoodSubsystem hoodSubsystem;
   public static LedSubsystem ledSubsystem;
 
   //controllers intace
@@ -63,6 +66,7 @@ public class RobotContainer {
 
         flywheelSubsystem = new FlywheelSubsystem(new FlywheelIOSim());
         turretSubsystem = new TurretSubsystem(new TurretIOSim());
+        hoodSubsystem = new HoodSubsystem(new HoodIOSim());
         break;
 
       case REAL:
@@ -100,8 +104,10 @@ public class RobotContainer {
                   ), 
                   "BR"),
                   new Gyro(new GyroIOPygeon2()));
-                  flywheelSubsystem = new FlywheelSubsystem(new FlywheelIOSim());
-                  turretSubsystem = new TurretSubsystem(new TurretIOSim());
+        flywheelSubsystem = new FlywheelSubsystem(new FlywheelIOSim());
+        turretSubsystem = new TurretSubsystem(new TurretIOSim());
+        hoodSubsystem = new HoodSubsystem(new HoodIOSim());
+
         break;
 
       default:
@@ -148,6 +154,7 @@ public class RobotContainer {
 
     driverJoystick.rightTrigger(0.5).whileTrue(new InstantCommand(()-> flywheelSubsystem.setVelocityModeRadsPerSec(60))).onFalse(new InstantCommand(()-> flywheelSubsystem.setCoastOut()));
     driverJoystick.a().onTrue(new InstantCommand(()-> turretSubsystem.setTargetRotation(new Rotation2d(Math.PI)))).onFalse(new InstantCommand(()-> turretSubsystem.setTargetRotation(new Rotation2d(0))));
+    driverJoystick.b().onTrue(new InstantCommand(()-> hoodSubsystem.setTargetPositionRads(100))).onFalse(new InstantCommand(()-> hoodSubsystem.setTargetPositionRads(0)));
   }
 
   /**
