@@ -41,7 +41,7 @@ public class ShootAimTargetCommand extends Command {
   public void end(boolean interrupted) 
   {
     hoodSubsystem.setTargetPositionRads(0);
-    flywheelSubsystem.setVelocityModeRadsPerSec(15);
+    flywheelSubsystem.setVelocityModeRadsPerSec(100);
   }
 
   // Returns true when the command should end.

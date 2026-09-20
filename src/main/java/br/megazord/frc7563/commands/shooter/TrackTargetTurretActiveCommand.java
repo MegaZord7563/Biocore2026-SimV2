@@ -7,7 +7,6 @@ package br.megazord.frc7563.commands.shooter;
 import br.megazord.frc7563.RobotState;
 import br.megazord.frc7563.subsystems.shooter.ShootCalculator;
 import br.megazord.frc7563.subsystems.shooter.turret.TurretSubsystem;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
@@ -27,7 +26,7 @@ public class TrackTargetTurretActiveCommand extends Command {
   public void execute() 
   {
     turretSubsystem.setTargetRotation(
-      shootCalculator.getTurretAngle().minus(RobotState.getInstance().getEstimatedPose().getRotation()).plus(Rotation2d.fromDegrees(90))
+      shootCalculator.getTurretAngle().minus(RobotState.getInstance().getEstimatedPose().getRotation())
     );
   }
 
