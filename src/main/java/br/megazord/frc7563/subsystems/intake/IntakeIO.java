@@ -19,14 +19,14 @@ public interface IntakeIO
     public double pivotVelocityRadsPerSec = 0.0;
     public double pivotAppliedVolts = 0.0;
     public double pivotSupplyCurrentAmps = 0.0;
-    public double pivotTempCelsius;
+    public double pivotTempCelsius = 0.0;
 
     public boolean rollersConnected = false;
     public double rollerPositionRads = 0.0;
     public double rollersVelocityRadsPerSec = 0.0;
     public double rollersAppliedVolts = 0.0;
     public double rollersSupplyCurrentAmps = 0.0;
-    public double rollersTempCelsius;
+    public double rollersTempCelsius = 0.0;
 
   }
 
@@ -42,12 +42,12 @@ public interface IntakeIO
     public IntakeIOOutputMode mode = IntakeIOOutputMode.COAST;
 
     public double rollersSpeedRadPerSec = 0.0;
-    public double pivotTargetPosition = 0.0;
+    public double pivotTargetPositionRads = 0.0;
     public double rollersCharacterizationOutput = 0.0;
   }
 
   public default void updateInputs(IntakeIOInputs inputs) {}
-  
+
   public default void applyOutputs(IntakeIOOutputs outputs) {}
 }
 
