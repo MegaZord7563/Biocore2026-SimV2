@@ -51,7 +51,7 @@ public class FlywheelSubsystem extends SubsystemBase {
 
   public void setBrakeOut()
   {
-    outputs.mode = FlywheelIOOutputMode.BRAKE;
+    outputs.mode = FlywheelIOOutputMode.BREAK;
     io.applyOutputs(outputs);
   }
 
