@@ -87,7 +87,7 @@ public class SwerveModuleIOSim implements SwerveModuleIO {
     @Override
     public void applyOutputs(SwerveModuleIOOutputs outputs) {
         switch (outputs.mode) {
-            case COAST, BRAKE:
+            case COAST, BREAK:
                 driveClosedLoop = false;
                 turnClosedLoop = false;
                 driveAppliedVolts = 0.0;
