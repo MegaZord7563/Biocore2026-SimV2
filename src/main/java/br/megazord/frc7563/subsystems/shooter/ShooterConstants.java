@@ -69,10 +69,9 @@ public final class ShooterConstants {
 
     /**
      * Hub position, blue alliance side.
-     * TODO: measure/verify against the official 2026 field drawings before
      * competition; this is a placeholder so ShootCalculator compiles and runs.
      */
-    public static final Translation2d kHubCenter = new Translation2d(8.27, 4.11);
+    public static final Translation2d kHubCenter = new Translation2d(Units.inchesToMeters(182.11), Units.inchesToMeters(158.84));
 
     /**
      * Feed/corner positions to shoot into when not aiming at the hub, blue

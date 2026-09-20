@@ -30,7 +30,7 @@ public class HoodIOTalonFX implements HoodIO {
     private final VoltageOut voltageOut = new VoltageOut(0.0);
 
     /* Keep a brake request so we can disable the motor */
-    private final NeutralOut breakeOut = new NeutralOut();
+    private final NeutralOut breakOut = new NeutralOut();
 
     /* Keep a coast request so we can disable the motor */
     private final CoastOut coastOut = new CoastOut();
@@ -62,7 +62,7 @@ public class HoodIOTalonFX implements HoodIO {
                 hoodMotor.setControl(coastOut);
                 break;
             case BREAK:
-                hoodMotor.setControl(breakeOut);
+                hoodMotor.setControl(breakOut);
                 break;
             default:
                 break;
@@ -123,8 +123,8 @@ public class HoodIOTalonFX implements HoodIO {
                 break;
         }
         if (!status.isOK()) {
-            System.out.println("Could not apply capo articulator configs, error code: " + status.toString());
-            DriverStation.reportWarning("Could not apply capo articulator configs, error code: " + status.toString(),
+            System.out.println("Could not apply hood configs, error code: " + status.toString());
+            DriverStation.reportWarning("Could not apply hood configs, error code: " + status.toString(),
                     false);
         }
     }

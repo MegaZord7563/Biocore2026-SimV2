@@ -74,7 +74,7 @@ public class HoodSubsystem extends SubsystemBase {
   {
     outputs.mode = HoodIOOutputsMode.POSITION;
     outputs.targetPositionRads = targetPositionRads;
-    Logger.recordOutput("Turret/targetRotation", targetPositionRads);
+    Logger.recordOutput("Hood/targetPosition", targetPositionRads);
     io.applyOutputs(outputs); 
   }
 }
