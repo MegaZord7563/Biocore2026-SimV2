@@ -7,9 +7,9 @@ package br.megazord.frc7563;
 import br.megazord.frc7563.Constants.DriveConstants;
 import br.megazord.frc7563.Constants.OIConstants;
 import br.megazord.frc7563.Constants.RobotConstants;
+import br.megazord.frc7563.commands.shooter.ShootAimTargetCommand;
 import br.megazord.frc7563.commands.shooter.TrackTargetTurretActiveCommand;
 import br.megazord.frc7563.subsystems.LedSubsystem;
-import br.megazord.frc7563.subsystems.shooter.ShootCalculator;
 import br.megazord.frc7563.subsystems.shooter.Flywheel.FlywheelIOSim;
 import br.megazord.frc7563.subsystems.shooter.Flywheel.FlywheelIOTalonFX;
 import br.megazord.frc7563.subsystems.shooter.Flywheel.FlywheelSubsystem;
@@ -27,7 +27,6 @@ import br.megazord.frc7563.subsystems.swerve.SwerveModuleIOSim;
 import br.megazord.frc7563.subsystems.swerve.SwerveModuleIOTalonFx;
 import br.megazord.frc7563.subsystems.swerve.SwerveSubsystem;
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.geometry.Rotation2d;
 // Wpilib imports
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -57,6 +56,7 @@ public class RobotContainer {
 
   //commands instance 
   private final TrackTargetTurretActiveCommand trackTargetTurretActiveCommand;
+  private final ShootAimTargetCommand shootAimTargetCommand;
 
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -125,6 +125,7 @@ public class RobotContainer {
 
     //Commands Instance
     trackTargetTurretActiveCommand = new TrackTargetTurretActiveCommand(turretSubsystem);
+    shootAimTargetCommand = new ShootAimTargetCommand(hoodSubsystem, flywheelSubsystem);
 
     swerveDrive.setDefaultCommand(new RunCommand(
         () -> swerveDrive.driveFieldOriented(
@@ -163,25 +164,11 @@ public class RobotContainer {
 
     driverJoystick.start().onTrue(new InstantCommand(()-> swerveDrive.SeedHeadingCamera()).ignoringDisable(true));
 
-    driverJoystick.rightTrigger(0.5).whileTrue(new InstantCommand(()-> flywheelSubsystem.setVelocityModeRadsPerSec(60))).onFalse(new InstantCommand(()-> flywheelSubsystem.setCoastOut()));
-    driverJoystick.a().onTrue(new InstantCommand(()-> turretSubsystem.setTargetRotation(new Rotation2d(Math.PI)))).onFalse(new InstantCommand(()-> turretSubsystem.setTargetRotation(new Rotation2d(0))));
-    driverJoystick.b().onTrue(new InstantCommand(()-> hoodSubsystem.setTargetPositionRads(100))).onFalse(new InstantCommand(()-> hoodSubsystem.setTargetPositionRads(0)));
-
     /** Shooter Calculator **/
     // While held, continuously solves for turret/hood/flywheel setpoints that
     // hit the hub from wherever the robot currently is (and however it's
     // currently moving) and drives the mechanisms to them.
-    driverJoystick.y().whileTrue(new RunCommand(() -> {
-      ShootCalculator.ShootParameters shot = ShootCalculator.getInstance().calculateMovingShot();
-      turretSubsystem.setTargetRotation(shot.turretTargetPosition());
-      hoodSubsystem.setTargetPositionRads(Math.toRadians(shot.hoodPosition()));
-      flywheelSubsystem.setVelocityModeRadsPerSec(shot.shootSpeedRps() * 2 * Math.PI);
-    }, turretSubsystem, hoodSubsystem, flywheelSubsystem))
-      .onFalse(new InstantCommand(() -> {
-        flywheelSubsystem.setCoastOut();
-        hoodSubsystem.setTargetPositionRads(0);
-        turretSubsystem.setTargetRotation(new Rotation2d(0));
-      }));
+    driverJoystick.rightTrigger(0.5).toggleOnTrue(shootAimTargetCommand);
   }
 
   /**
