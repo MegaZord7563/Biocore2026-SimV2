@@ -18,6 +18,9 @@ public class ShootAimTargetCommand extends Command {
   private FlywheelSubsystem flywheelSubsystem;
 
   public ShootAimTargetCommand(HoodSubsystem hoodSubsystem, FlywheelSubsystem flywheelSubsystem) {
+    this.hoodSubsystem = hoodSubsystem;
+    this.flywheelSubsystem = flywheelSubsystem;
+
     addRequirements(hoodSubsystem, flywheelSubsystem);
   }
 

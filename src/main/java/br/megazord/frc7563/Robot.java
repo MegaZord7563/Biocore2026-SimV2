@@ -26,6 +26,7 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 // local imports
 import br.megazord.frc7563.Constants.RobotConstants;
 import br.megazord.frc7563.build.BuildConstants;
+import br.megazord.frc7563.subsystems.shooter.ShootCalculator;
 import br.megazord.frc7563.util.Elastic;
 
 /**
@@ -40,6 +41,7 @@ public class Robot extends LoggedRobot {
   private Command m_testCommand;
 
   private final RobotContainer m_robotContainer;
+  private ShootCalculator m_shootCalculator = ShootCalculator.getInstance();
 
   private double autoStart;
   private boolean autoMessagePrinted;
@@ -198,6 +200,7 @@ public class Robot extends LoggedRobot {
     Logger.recordOutput("Robot/BatteryVoltage", batteryVoltage);
     Logger.recordOutput("Robot/MatchTime", DriverStation.getMatchTime());
 
+    m_shootCalculator.calculateMovingShot();
     driverJoystickAlert.set(!m_robotContainer.driverJoystick.isConnected());
     // arcadeJoyLeftAlert.set();
     // arcadeJoyRightAlert.set();
