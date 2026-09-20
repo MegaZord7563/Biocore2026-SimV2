@@ -86,7 +86,7 @@ public class SwerveModule {
 
     /** Disables all motor outputs in brake mode. */
     public void brake() {
-        outputs.mode = SwerveModuleIOOutputMode.BRAKE;
+        outputs.mode = SwerveModuleIOOutputMode.BREAK;
         outputs.driveVelocityRadPerSec = 0.0;
         io.applyOutputs(outputs);
     }

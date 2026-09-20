@@ -44,14 +44,10 @@ public class SwerveModuleIOTalonFx implements SwerveModuleIO {
     private final PositionVoltage turnPID = new PositionVoltage(0).withSlot(0);
 
     /* Keep a brake request so we can disable the motor */
-    private final NeutralOut brakeOut = new NeutralOut();
+    private final NeutralOut breakOut = new NeutralOut();
 
     /* Keep a coast request so we can disable the motor */
     private final CoastOut coastOut = new CoastOut();
-
-    private boolean driveClosedLoop = false;
-    private boolean turnClosedLoop = false;
-    private SwerveModuleIOOutputMode mode = SwerveModuleIOOutputMode.COAST;
 
     private double chassisAngularOffset = 0.0;
     private Rotation2d absoluteEncoderOffset = Rotation2d.kZero;
@@ -85,22 +81,6 @@ public class SwerveModuleIOTalonFx implements SwerveModuleIO {
 
     @Override
     public void updateInputs(SwerveModuleIOInputs inputs) {
-        // Run closed-loop control
-        if (driveClosedLoop) {
-            driveMotor.setControl(drivePID);
-        } else if (mode == SwerveModuleIOOutputMode.BRAKE) {
-            driveMotor.setControl(brakeOut);
-        } else {
-            driveMotor.setControl(coastOut);
-        }
-        if (turnClosedLoop) {
-            turnMotor.setControl(turnPID);
-        } else if (mode == SwerveModuleIOOutputMode.BRAKE) {
-            turnMotor.setControl(brakeOut);
-        } else {
-            turnMotor.setControl(coastOut);
-        }
-
         inputs.driveConnected = driveMotor.isConnected();
         inputs.drivePositionRads = Units.rotationsToRadians(driveMotor.getPosition().getValueAsDouble());
         inputs.driveVelocityRadsPerSec = Units.rotationsToRadians(driveMotor.getVelocity().getValueAsDouble());
@@ -123,24 +103,24 @@ public class SwerveModuleIOTalonFx implements SwerveModuleIO {
 
     @Override
     public void applyOutputs(SwerveModuleIOOutputs outputs) {
-        mode = outputs.mode;
         switch (outputs.mode) {
-            case COAST, BRAKE:
-                driveClosedLoop = false;
-                turnClosedLoop = false;
-                break;
-
             case DRIVE:
-                driveClosedLoop = true;
-                turnClosedLoop = true;
-                drivePID.withVelocity(Units.radiansToRotations(outputs.driveVelocityRadPerSec));
-                turnPID.withPosition(Units.radiansToRotations(outputs.turnRotation.getRadians()));
+                driveMotor.setControl(drivePID.withVelocity(Units.radiansToRotations(outputs.driveVelocityRadPerSec)));
+                turnMotor.setControl(turnPID.withPosition(Units.radiansToRotations(outputs.turnRotation.getRadians())));
                 break;
-
             case CHARACTERIZE:
-                driveClosedLoop = false;
-                turnClosedLoop = true;
-                turnPID.withPosition(Units.radiansToRotations(outputs.turnRotation.getRadians()));
+                turnMotor.setControl(turnPID.withPosition(Units.radiansToRotations(outputs.turnRotation.getRadians())));
+                break;
+            case COAST:
+                turnMotor.setControl(coastOut);
+                driveMotor.setControl(coastOut);
+                break;
+            case BREAK:
+                turnMotor.setControl(breakOut);
+                driveMotor.setControl(breakOut);
+                break;
+            default:
+                break;
         }
     }
 

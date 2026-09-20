@@ -37,7 +37,7 @@ public interface SwerveModuleIO
 
   public static enum SwerveModuleIOOutputMode {
     COAST,
-    BRAKE,
+    BREAK,
     DRIVE,
     CHARACTERIZE
   }
