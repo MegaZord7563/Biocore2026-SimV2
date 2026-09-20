@@ -56,14 +56,14 @@ public class FlywheelIOSim implements FlywheelIO {
         switch (outputs.mode) {
             case VOLTAGE:
                 cloosedLoop = false;
-                appliedVolts = outputs.voltage;
+                appliedVolts = outputs.voltageOut;
                 break;
             case VELOCITY:
                 cloosedLoop = true;
                 flywheelPID.setSetpoint(outputs.velocityRadsPerSec);
                 flywheelFF.calculate(outputs.velocityRadsPerSec);
                 break;
-            case BRAKE:
+            case BREAK:
                 cloosedLoop = false;
                 appliedVolts = 0.0;
                 break;

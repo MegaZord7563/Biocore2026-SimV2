@@ -29,7 +29,7 @@ public interface FlywheelIO {
 
     public static enum FlywheelIOOutputMode {
         COAST,
-        BRAKE,
+        BREAK,
         VELOCITY,
         VOLTAGE,
         CHARACTERIZE
@@ -38,7 +38,7 @@ public interface FlywheelIO {
     public class FlywheelIOOutputs {
         public FlywheelIOOutputMode mode = FlywheelIOOutputMode.COAST;
         public double velocityRadsPerSec = 0.0;
-        public double voltage = 0.0;
+        public double voltageOut = 0.0;
         public double CharacterizationOutput = 0.0;
     }
 
