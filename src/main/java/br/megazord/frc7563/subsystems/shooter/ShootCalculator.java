@@ -187,6 +187,7 @@ public class ShootCalculator {
   }
 
   private Translation2d getTargetTranslation(Translation2d robotTranslation) {
+    aimToHub(!robotState.isInsideNeutralShootingZone());
     boolean isRedAlliance = DriverStation.getAlliance().isPresent()
         && DriverStation.getAlliance().get() == Alliance.Red;
 
@@ -210,12 +211,16 @@ public class ShootCalculator {
   }
 
   /**
-   * @param isHub true to aim/shoot at the hub (uses the interpolated hood
+   * @return isHub true to aim/shoot at the hub (uses the interpolated hood
    *              angle map and full flywheel speed), false to shoot at
    *              whichever corner target is currently closest to the robot,
    *              at the fixed, lower-speed shot used for that target.
    */
-  public boolean aimToHub(boolean isHub) {
+  public boolean aimToHub() {
+    return isHub;
+  }
+
+  private boolean aimToHub(boolean isHub) {
     this.isHub = isHub;
     return isHub;
   }
