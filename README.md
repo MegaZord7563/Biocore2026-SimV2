@@ -113,7 +113,7 @@ The rest of the season's mechanisms (intake, shooter/turret, feeder, indexer) al
 <tr>
 <td>Shooter (Turret, Flywheel, Capo)</td>
 <td><code>Constants.SubsystemsConstants.shooterConstants</code></td>
-<td>🟡 Gains + interpolation maps staged, subsystem pending</td>
+<td>🟢 Gains + interpolation maps staged, subsystem pending</td>
 </tr>
 <tr>
 <td>Feeder</td>
