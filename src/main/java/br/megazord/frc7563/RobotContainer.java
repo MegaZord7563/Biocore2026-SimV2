@@ -7,6 +7,7 @@ package br.megazord.frc7563;
 import br.megazord.frc7563.Constants.DriveConstants;
 import br.megazord.frc7563.Constants.OIConstants;
 import br.megazord.frc7563.Constants.RobotConstants;
+import br.megazord.frc7563.commands.shooter.TrackTargetTurretActiveCommand;
 import br.megazord.frc7563.subsystems.LedSubsystem;
 import br.megazord.frc7563.subsystems.shooter.ShootCalculator;
 import br.megazord.frc7563.subsystems.shooter.Flywheel.FlywheelIOSim;
@@ -53,6 +54,9 @@ public class RobotContainer {
 
   //controllers intace
   public final CommandXboxController driverJoystick = new CommandXboxController(0);
+
+  //commands instance 
+  private final TrackTargetTurretActiveCommand trackTargetTurretActiveCommand;
 
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -119,6 +123,9 @@ public class RobotContainer {
 
     ledSubsystem = new LedSubsystem(swerveDrive, 0);
 
+    //Commands Instance
+    trackTargetTurretActiveCommand = new TrackTargetTurretActiveCommand(turretSubsystem);
+
     swerveDrive.setDefaultCommand(new RunCommand(
         () -> swerveDrive.driveFieldOriented(
             () -> -MathUtil.applyDeadband(driverJoystick.getLeftY(), OIConstants.kDeadband),
@@ -127,7 +134,8 @@ public class RobotContainer {
             () -> driverJoystick.rightStick().getAsBoolean()),
         swerveDrive)// .onlyIf(()-> !driverJoystick.getHID().getXButton())
     );
-    
+    turretSubsystem.setDefaultCommand(trackTargetTurretActiveCommand);
+
     configureBindings();
   }
 
