@@ -34,8 +34,6 @@ import br.megazord.frc7563.subsystems.swerve.SwerveSubsystem;
  */
 public class LedSubsystem extends SubsystemBase
 {
-  /** PWM header the strip is wired to. Must be a PWM header, not MXP or DIO. */
-  private static final int LED_PWM_PORT = 0;
   /** Number of pixels on the strip. Length is expensive to set, so it is set once. */
   private static final int LED_LENGTH = 60;
 
@@ -64,7 +62,7 @@ public class LedSubsystem extends SubsystemBase
    */
   private boolean followDriveSpeed = true;
 
-  public LedSubsystem(SwerveSubsystem swerve)
+  public LedSubsystem(SwerveSubsystem swerve, int LED_PWM_PORT)
   {
     swerveSubsystem = swerve;
 

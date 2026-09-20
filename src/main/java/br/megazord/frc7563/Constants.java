@@ -13,19 +13,13 @@ import com.pathplanner.lib.config.ModuleConfig;
 import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.config.RobotConfig;
 import com.revrobotics.spark.ClosedLoopSlot;
-import com.revrobotics.spark.SparkLowLevel.MotorType;
 
 //WPI Imports
 import edu.wpi.first.math.controller.HolonomicDriveController;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Rotation3d;
-import edu.wpi.first.math.geometry.Transform2d;
-import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.geometry.Translation3d;
-import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
@@ -506,199 +500,9 @@ public final class Constants {
       public static final double articulatorStartAngle = 2.15;
     }
 
-    public static final class shooterConstants {
-      public static final class ShooterGeometryConstants 
-      {
-
-        /* shooter pose on robot */
-        public static final double Dx = -0.1445;
-        public static final double Dy = -0.1516;
-        public static final double Dz = 0.364;
-        /******************************
-         * Geometry Importants Values *
-         ******************************/
-        public static final Transform3d RobotToTurret3d = new Transform3d(new Translation3d(Dx, Dy, Dz),
-                                                                          Rotation3d.kZero);
-        public static final Transform2d RobotToTurret2d = new Transform2d(new Translation2d(Dx, Dy),
-                                                                          new Rotation2d(0.0));
-      }
-
-      public static final class ShootCalculatorConstansts 
-      {
-        public static InterpolatingDoubleTreeMap ToFMap = new InterpolatingDoubleTreeMap();
-
-        public static InterpolatingDoubleTreeMap HoodAngleMap = new InterpolatingDoubleTreeMap();
-
-        public static InterpolatingDoubleTreeMap FlywheelMap = new InterpolatingDoubleTreeMap();
-
-        public static InterpolatingDoubleTreeMap getTofmap() 
-        {
-          return ToFMap;
-        }
-
-        public static InterpolatingDoubleTreeMap getHoodanglemap() 
-        {
-          return HoodAngleMap;
-        }
-
-        public static InterpolatingDoubleTreeMap getFlywheelmap() 
-        {
-          return FlywheelMap;
-        }
-
-        public static final double minDistance = 1.34;
-        public static final double maxDistance = 5.60;
-
-        static 
-        {
-
-          HoodAngleMap.put(1.0, 28.3);
-          HoodAngleMap.put(2.0, 28.3 * 2);
-          HoodAngleMap.put(3.0, 28.3 * 3);
-          HoodAngleMap.put(4.0, 28.3 * 4);
-          HoodAngleMap.put(5.0, 28.3 * 5);
-          HoodAngleMap.put(6.0, 160.0);
-
-          FlywheelMap.put(1.0, 48.2);
-          FlywheelMap.put(1.5, 51.5);
-          FlywheelMap.put(2.0, 53.6);
-          FlywheelMap.put(2.5, 56.8);
-          FlywheelMap.put(3.0, 58.2);
-          FlywheelMap.put(3.5, 62.5);
-          //FlywheelMap.put(3.8, 63.5);
-          FlywheelMap.put(4.00, 66.00);
-          FlywheelMap.put(4.24, 63.66);
-          FlywheelMap.put(4.30, 63.10);
-          FlywheelMap.put(5.42, 71.38);
-          FlywheelMap.put(5.76, 71.67);
-
-          // ToFMap.put(1.61, 0.98);
-          // ToFMap.put(2.0, 0.97);
-          /*ToFMap.put(1.0, 1.05); // 0.92
-          ToFMap.put(1.5, 1.0);
-          ToFMap.put(2.0, 1.08);
-          ToFMap.put(2.5, 1.09);
-          ToFMap.put(3.0, 1.15);
-          ToFMap.put(4.0, 1.15);
-          ToFMap.put(5.0, 1.15);*/
-          ToFMap.put(1.0, 1.05);
-          ToFMap.put(1.5, 1.00);
-          ToFMap.put(2.0, 1.08);
-          ToFMap.put(2.5, 1.09);
-          ToFMap.put(3.0, 1.15);
-          ToFMap.put(3.5, 1.08);
-          ToFMap.put(4.0, 1.19);
-          ToFMap.put(4.5, 1.25);
-          ToFMap.put(5.0, 1.24);
-          ToFMap.put(5.5, 1.26);
-          ToFMap.put(6.0, 1.24);
-         
-
-
-
-          /**
-           * 
-           * 
-           * timeOfFlightMap.put(5.68, 1.16);
-           * timeOfFlightMap.put(4.55, 1.12);
-           * timeOfFlightMap.put(3.15, 1.11);
-           * timeOfFlightMap.put(1.88, 1.09);
-           * timeOfFlightMap.put(1.38, 0.90);
-           */
-        }
-
-      }
-
-      public static final class TurretConstants 
-      {
-        /* to implement */
-        /* motors infos */
-        public static final int kTurretMotorId = 16;
-        public static final NeutralModeValue kMotorNeutralMode = NeutralModeValue.Coast;
-
-        /* current limit */
-        public static final double kMotorThresholdCurrent = 60;
-        public static final boolean kMotorEnableCurrentLimit = true;
-        /* feedback sensor */
-        public static final double kMotorGearRatio = 18.45;//12.3; //18.45;
-        public static final boolean kContinuousWrap = false;
-
-        /*----------------- PID constants--------------- */
-        public static final double kDriveClosedLoopRamp = 0.25;
-        public static final double KS = 0.0;//1.0069;
-        public static final double KV = 0.0;//0.0035301;
-        public static final double kP = 1000;// 65.619;
-        public static final double kI = 0;
-        public static final double kD = 0;
-
-        /* soft limits configs */
-
-        public static final boolean kForwardSoftLimitEnable = true;
-        public static final boolean kReverseSoftLimitEnable = true;
-        public static final double kForwardSoftLimitThreshold = Units.degreesToRotations(180);
-        public static final double kReverseSoftLimitThreshold = -Units.degreesToRotations(180);
-
-      }
-
-      public static final class CapoArticulatorConstants 
-      {
-        /* to implement */
-        /* motors infos */
-
-        public static final int kCapoArticulatorMotorId = 18;
-        public static final NeutralModeValue kMotorNeutalMode = NeutralModeValue.Coast;
-        public static final MotorType kMotorType = MotorType.kBrushless;
-
-        /* current limit */
-        public static final double kMotorThresholdCurrent = 60;
-        public static final boolean kMotorEnableCurrentLimit = true;
-
-        /* feedback sensor */
-        public static final double kDriveMotorGearRatio = 2.833;
-        public static final boolean kContinuousWrap = false;
-
-        /* -----------PID constants-------------------- */
-        public static final double KS = 0;
-        public static final double KV = 0.00566;
-        public static final double kP = 70;
-        public static final double kI = 0;
-        public static final double kD = 0;
-
-        /* soft limits */
-        public static final boolean kForwardSoftLimitEnable = true;
-        public static final boolean kReverseSoftLimitEnable = false;
-        public static final double kForwardSoftLimitThreshold = Units.degreesToRotations(160);
-        public static final double kReverseSoftLimitThreshold = 0;
-      }
-
-      public static final class shooterWheelConstants {
-
-        public static final int kFollowerMotorId = 19;
-        /* to implement */
-        public static final int kShooterWheelMotorId = 17;
-        public static final NeutralModeValue kMotorNeutralMode = NeutralModeValue.Coast;
-        public static final double kMotorThresholdCurrent = 120;
-        public static final double kMotorSupplyCurrent = 70;
-
-        public static final boolean kMotorEnableCurrentLimit = true;
-        public static final boolean kContinuousWrap = false;
-        public static final double kDriveMotorGearRatio = 1;
-
-        // *------------PID GAINS--------------------- */
-        public static final double kSlot0kS = 0.23121;//0.32743;
-        public static final double kSlot0kV = 0.12235;//0.12664;
-        public static final double kSlot0kP = 8.14487;//0.14487;//0.20002;
-        public static final double kSlot0kI = 0;
-        public static final double kSlot0kD = 0;
-
-
-        public static final double kSlot1kS = 0.23121;
-        public static final double kSlot1kV = 0.12235;
-        public static final double kSlot1kP = 0.14487;
-        public static final double kSlot1kI = 0;
-        public static final double kSlot1kD = 0;
-      }
-    }
+    // Shooter constants (turret/hood/flywheel/calculator) now live in
+    // br.megazord.frc7563.subsystems.shooter.ShooterConstants, next to the
+    // shooter's code instead of buried in this file.
 
     public static final class FeederConstants {
       public static final int motorFeederPort = 15;
