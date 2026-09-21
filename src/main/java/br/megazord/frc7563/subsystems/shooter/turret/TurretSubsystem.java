@@ -51,7 +51,7 @@ public class TurretSubsystem extends SubsystemBase {
 
   public Rotation2d getTurretRotation2d()
   {
-    return Rotation2d.fromDegrees(inputs.turretPositionRads).plus(Rotation2d.fromDegrees(-90));
+    return Rotation2d.fromDegrees(inputs.turretPositionRads).plus(Rotation2d.fromDegrees(90));
   }
 
   public double getSupplyCurrent()
@@ -79,7 +79,7 @@ public class TurretSubsystem extends SubsystemBase {
   public void setTargetRotation(Rotation2d targetRotation)
   {
     outputs.mode = TurretIOOutputsMode.POSITION;
-    outputs.targetRotation = targetRotation.plus(Rotation2d.fromDegrees(-90));
+    outputs.targetRotation = targetRotation.plus(Rotation2d.fromDegrees(90));
     Logger.recordOutput("Turret/targetRotation", targetRotation);
     io.applyOutputs(outputs); 
   }
