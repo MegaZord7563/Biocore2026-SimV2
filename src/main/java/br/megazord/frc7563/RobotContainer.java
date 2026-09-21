@@ -11,6 +11,7 @@ import br.megazord.frc7563.commands.shooter.ShootAimTargetCommand;
 import br.megazord.frc7563.commands.shooter.TrackTargetTurretActiveCommand;
 import br.megazord.frc7563.subsystems.LedSubsystem;
 import br.megazord.frc7563.subsystems.intake.IntakeIOSim;
+import br.megazord.frc7563.subsystems.intake.IntakeIOTalonFX;
 import br.megazord.frc7563.subsystems.intake.IntakeSubsystem;
 import br.megazord.frc7563.subsystems.shooter.Flywheel.FlywheelIOSim;
 import br.megazord.frc7563.subsystems.shooter.Flywheel.FlywheelIOTalonFX;
@@ -119,7 +120,7 @@ public class RobotContainer {
         flywheelSubsystem = new FlywheelSubsystem(new FlywheelIOTalonFX());
         turretSubsystem = new TurretSubsystem(new TurretIOTalonFX());
         hoodSubsystem = new HoodSubsystem(new HoodIOTalonFX());
-        // Intake real IO (e.g. IntakeIOTalonFX) not implemented yet - intakeSubsystem stays null in REAL for now.
+        intakeSubsystem = new IntakeSubsystem(new IntakeIOTalonFX());
         break;
 
       default:
@@ -182,7 +183,6 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-    // An example command will be run in autonomous
     return null;
   }
 

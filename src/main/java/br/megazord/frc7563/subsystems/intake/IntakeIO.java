@@ -33,7 +33,7 @@ public interface IntakeIO
   public static enum IntakeIOOutputMode {
     RUN,
     MOVE,
-    CHARACTERIZE,
+    CHARACTERIZE, // TODO: implement this funcion
     COAST,
     BREAK
   }

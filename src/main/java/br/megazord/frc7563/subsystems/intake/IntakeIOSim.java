@@ -114,7 +114,7 @@ public class IntakeIOSim implements IntakeIO
                 pivotPID.setSetpoint(outputs.pivotTargetPositionRads);
                 break;
             case CHARACTERIZE:
-                // Not implemented yet.
+                // Not implemented yet. 
                 rollersClosedLoop = false;
                 pivotClosedLoop = false;
                 rollersAppliedVolts = 0.0;
