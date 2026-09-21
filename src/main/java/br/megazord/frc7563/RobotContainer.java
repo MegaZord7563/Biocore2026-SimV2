@@ -10,6 +10,9 @@ import br.megazord.frc7563.Constants.RobotConstants;
 import br.megazord.frc7563.commands.shooter.ShootAimTargetCommand;
 import br.megazord.frc7563.commands.shooter.TrackTargetTurretActiveCommand;
 import br.megazord.frc7563.subsystems.LedSubsystem;
+import br.megazord.frc7563.subsystems.intake.IntakeIOSim;
+import br.megazord.frc7563.subsystems.intake.IntakeIOTalonFX;
+import br.megazord.frc7563.subsystems.intake.IntakeSubsystem;
 import br.megazord.frc7563.subsystems.shooter.Flywheel.FlywheelIOSim;
 import br.megazord.frc7563.subsystems.shooter.Flywheel.FlywheelIOTalonFX;
 import br.megazord.frc7563.subsystems.shooter.Flywheel.FlywheelSubsystem;
@@ -49,6 +52,7 @@ public class RobotContainer {
   private FlywheelSubsystem flywheelSubsystem;
   private TurretSubsystem turretSubsystem;
   private HoodSubsystem hoodSubsystem;
+  private IntakeSubsystem intakeSubsystem;
   public static LedSubsystem ledSubsystem;
 
   //controllers intace
@@ -75,6 +79,7 @@ public class RobotContainer {
         flywheelSubsystem = new FlywheelSubsystem(new FlywheelIOSim());
         turretSubsystem = new TurretSubsystem(new TurretIOSim());
         hoodSubsystem = new HoodSubsystem(new HoodIOSim());
+        intakeSubsystem = new IntakeSubsystem(new IntakeIOSim());
         break;
 
       case REAL:
@@ -115,6 +120,7 @@ public class RobotContainer {
         flywheelSubsystem = new FlywheelSubsystem(new FlywheelIOTalonFX());
         turretSubsystem = new TurretSubsystem(new TurretIOTalonFX());
         hoodSubsystem = new HoodSubsystem(new HoodIOTalonFX());
+        intakeSubsystem = new IntakeSubsystem(new IntakeIOTalonFX());
         break;
 
       default:
@@ -169,6 +175,10 @@ public class RobotContainer {
     // hit the hub from wherever the robot currently is (and however it's
     // currently moving) and drives the mechanisms to them.
     driverJoystick.rightTrigger(0.5).toggleOnTrue(shootAimTargetCommand).onTrue(new InstantCommand(()-> swerveDrive.setDriveMode(DriveConstants.DriveMode.SHOOTING)));
+
+    /** Intake Commands */
+    driverJoystick.leftTrigger(0.5).onTrue(new InstantCommand(()-> intakeSubsystem.intake(), intakeSubsystem)).onFalse(new InstantCommand(()-> intakeSubsystem.setCoastOut()));
+    driverJoystick.b().onTrue(new InstantCommand(()-> intakeSubsystem.outtake(), intakeSubsystem)).onFalse(new InstantCommand(()-> intakeSubsystem.setCoastOut(), intakeSubsystem));
   }
 
   /**
@@ -177,7 +187,6 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-    // An example command will be run in autonomous
     return null;
   }
 

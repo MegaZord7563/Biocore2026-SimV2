@@ -448,57 +448,9 @@ public final class Constants {
    * implement here constants for subsystems
    */
   public static final class SubsystemsConstants {
-    public static final class IntakeConstants {
-      /* Intake Constants */
-      public static final int kIntakeMotorID = 21;
-
-      public static final boolean kIntakeMotorEnableCurrentLimit = true;
-      public static final double kIntakeMotorGearRatio = 1;
-      public static final double kIntakeClosedLoopRamp = 0;
-      public static final NeutralModeValue kIntakeMotorNeutalMode = NeutralModeValue.Coast;
-      public static final double kIntakeMotorThresholdCurrent = 120;
-      public static final double kIntakeMotorSupplyCurrent = 70;
-      // ----------------*Pid Constants Intake rollers*----------------
-      public static final double KSIntake = 0.41978;
-      public static final double KVIntake = 0.043145;
-      public static final double kPIntake = 0.068582;
-      public static final double kDIntake = 0;// 0.2
-      public static final double kIIntake = 0;// 0.1
-
-      /* Ariculator Constants */
-      public static final int kArticulatorMotorID = 20;
-
-      public static final NeutralModeValue kArticulatorMotorNeutalMode = NeutralModeValue.Coast;
-      public static final double kArticulatorMotorThresholdCurrent = 80;// 80;
-
-      public static final double kArticulatorMotorSupplyCurrent = 30;
-      public static final boolean kArticulatorMotorEnableCurrentLimit = true;
-      public static final double kArticulatorMotorGearRatio = 8.57;//<--new gearbox ratio 04/25/2026 9 on the gearbox plus 21/20 pulley ----15.0;
-      public static final double kArticulatorClosedLoopRamp = 0.25;
-
-      // ------------------- PID SLOT 0 GAINS-----------------
-      public static final double KSArticulator = 1.4756;
-      public static final double KVArticulator = 0;
-      public static final double kPArticulator = 30;// 6.9823
-      public static final double kIArticulator = 0.0;
-      public static final double kDArticulator = 5.0526;
- 
-      // -------------------PID SLOT 1 GAINS-----------------
-      public static final double KS1Articulator = 1.4756;
-      public static final double KV1Articulator = 0;
-      public static final double kP1Articulator = 160;// 6.9823
-      public static final double kI1Articulator = 0.0;
-      public static final double kD1Articulator = 5.0526;
-
-      public static final double articulatorUpAngle = 0.4;
-      public static final double articulatorDownAngle = 2.05;
-
-      public static final double IntakeModeSpeed = 100;
-
-      public static final double OutakeModeSpeed = -50;
-
-      public static final double articulatorStartAngle = 2.15;
-    }
+    // Intake constants (pivot/rollers) now live in
+    // br.megazord.frc7563.subsystems.intake.IntakeConstants, next to the
+    // intake's code, the same way shooter constants were split out below.
 
     // Shooter constants (turret/hood/flywheel/calculator) now live in
     // br.megazord.frc7563.subsystems.shooter.ShooterConstants, next to the
