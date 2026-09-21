@@ -175,6 +175,10 @@ public class RobotContainer {
     // hit the hub from wherever the robot currently is (and however it's
     // currently moving) and drives the mechanisms to them.
     driverJoystick.rightTrigger(0.5).toggleOnTrue(shootAimTargetCommand).onTrue(new InstantCommand(()-> swerveDrive.setDriveMode(DriveConstants.DriveMode.SHOOTING)));
+
+    /** Intake Commands */
+    driverJoystick.leftTrigger(0.5).onTrue(new InstantCommand(()-> intakeSubsystem.intake(), intakeSubsystem)).onFalse(new InstantCommand(()-> intakeSubsystem.setCoastOut()));
+    driverJoystick.b().onTrue(new InstantCommand(()-> intakeSubsystem.outtake(), intakeSubsystem)).onFalse(new InstantCommand(()-> intakeSubsystem.setCoastOut(), intakeSubsystem));
   }
 
   /**
