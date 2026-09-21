@@ -5,30 +5,46 @@
 package br.megazord.frc7563.subsystems.intake;
 
 import br.megazord.frc7563.Constants.RobotConstants;
+import br.megazord.frc7563.subsystems.intake.IntakeConstants.Pivot;
+import br.megazord.frc7563.subsystems.intake.IntakeConstants.Rollers;
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.wpilibj.simulation.DCMotorSim;
 
-/** Add your docs here. */
+/** Simulated IO for the intake (pivot + rollers). */
 public class IntakeIOSim implements IntakeIO 
 {
-    private static final DCMotor motorModel = DCMotor.getKrakenX60Foc(1);
+    private static final DCMotor pivotMotorModel = DCMotor.getKrakenX60Foc(1);
+    private static final DCMotor rollersMotorModel = DCMotor.getKrakenX60Foc(1);
 
     private final DCMotorSim pivotMotor = new DCMotorSim(
-            LinearSystemId.createDCMotorSystem(motorModel, 0.025, 1),// ModuleConstants.kDriveMotorGearRatio),
-            motorModel);
+            LinearSystemId.createDCMotorSystem(pivotMotorModel, 0.025, Pivot.kMotorGearRatio),
+            pivotMotorModel);
 
     private final DCMotorSim rollersMotor = new DCMotorSim(
-            LinearSystemId.createDCMotorSystem(motorModel, 0.004, 1),// ModuleConstants.kTurningMotorGearRatio),
-            motorModel);
+            LinearSystemId.createDCMotorSystem(rollersMotorModel, 0.004, Rollers.kMotorGearRatio),
+            rollersMotorModel);
 
-    private final PIDController pivotPID = new PIDController(0.0, 0.0, 0.0);
-    private final PIDController rollersPID = new PIDController(0.0,0.0,0,0);
-    
+    // Gains are tuned in rotations (TalonFX convention, see IntakeConstants), sim runs in radians.
+    private final PIDController pivotPID = new PIDController(
+            Pivot.kSlot0kP / (2 * Math.PI),
+            Pivot.kSlot0kI / (2 * Math.PI),
+            Pivot.kSlot0kD / (2 * Math.PI));
+
+    private final PIDController rollersPID = new PIDController(
+            Rollers.kP / (2 * Math.PI),
+            Rollers.kI / (2 * Math.PI),
+            Rollers.kD / (2 * Math.PI));
+
+    private final SimpleMotorFeedforward rollersFF = new SimpleMotorFeedforward(
+            Rollers.kS / (2 * Math.PI),
+            Rollers.kV / (2 * Math.PI));
 
     private double pivotAppliedVolts = 0.0;
     private double rollersAppliedVolts = 0.0;
+    private double rollersFeedForwardVolts = 0.0;
     private boolean pivotClosedLoop = false;
     private boolean rollersClosedLoop = false;
 
@@ -47,7 +63,7 @@ public class IntakeIOSim implements IntakeIO
 
         if(rollersClosedLoop)
         {  
-            rollersAppliedVolts = rollersPID.calculate(rollersMotor.getAngularVelocityRadPerSec());
+            rollersAppliedVolts = rollersPID.calculate(rollersMotor.getAngularVelocityRadPerSec()) + rollersFeedForwardVolts;
         } else 
         {
             rollersPID.reset();
@@ -87,19 +103,22 @@ public class IntakeIOSim implements IntakeIO
                 rollersClosedLoop = true;
                 pivotClosedLoop = false;
                 rollersPID.setSetpoint(outputs.rollersSpeedRadPerSec);
+                rollersFeedForwardVolts = rollersFF.calculate(outputs.rollersSpeedRadPerSec);
                 pivotAppliedVolts = 0.0;
                 break;
             case MOVE:
                 rollersClosedLoop = true;
                 pivotClosedLoop = true;
                 rollersPID.setSetpoint(outputs.rollersSpeedRadPerSec);
+                rollersFeedForwardVolts = rollersFF.calculate(outputs.rollersSpeedRadPerSec);
                 pivotPID.setSetpoint(outputs.pivotTargetPositionRads);
                 break;
             case CHARACTERIZE:
+                // Not implemented yet.
                 rollersClosedLoop = false;
-                pivotClosedLoop = true;
-                rollersAppliedVolts = outputs.rollersCharacterizationOutput;
-                pivotPID.setSetpoint(outputs.pivotTargetPositionRads);
+                pivotClosedLoop = false;
+                rollersAppliedVolts = 0.0;
+                pivotAppliedVolts = 0.0;
                 break;
             default:
                 break;

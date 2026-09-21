@@ -7,7 +7,7 @@ package br.megazord.frc7563.subsystems.intake;
 import org.littletonrobotics.junction.AutoLog;
 
 /** 
- * Interface for swerve module I/O operations.
+ * Interface for intake (pivot + rollers) I/O operations.
  * 
  */
 public interface IntakeIO 
