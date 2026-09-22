@@ -164,9 +164,8 @@ public class RobotContainer {
   {
     /** Swerve Comands **/
     //speed controls
-    driverJoystick.rightBumper().onTrue(new InstantCommand(()-> swerveDrive.setDriveMode(DriveConstants.DriveMode.FAST), swerveDrive));
-    driverJoystick.leftBumper().onTrue(new InstantCommand(()-> swerveDrive.setDriveMode(DriveConstants.DriveMode.SLOW), swerveDrive));
-    driverJoystick.leftBumper().and(driverJoystick.rightBumper()).onTrue(new InstantCommand(()-> swerveDrive.setDriveMode(DriveConstants.DriveMode.MAX), swerveDrive));
+    driverJoystick.rightBumper().whileTrue(swerveDrive.setDriveModeCommand(DriveConstants.DriveMode.SLOW)).onFalse(swerveDrive.setDriveModeCommand(DriveConstants.DriveMode.FAST));
+    driverJoystick.leftBumper().whileTrue(swerveDrive.setDriveModeCommand(DriveConstants.DriveMode.MAX)).onFalse(swerveDrive.setDriveModeCommand(DriveConstants.DriveMode.FAST));
 
     driverJoystick.start().onTrue(new InstantCommand(()-> swerveDrive.SeedHeadingCamera()).ignoringDisable(true));
 

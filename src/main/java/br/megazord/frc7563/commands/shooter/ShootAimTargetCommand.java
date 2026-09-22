@@ -5,6 +5,7 @@
 package br.megazord.frc7563.commands.shooter;
 
 import br.megazord.frc7563.RobotState;
+import br.megazord.frc7563.Constants.DriveConstants.DriveMode;
 import br.megazord.frc7563.subsystems.shooter.ShootCalculator;
 import br.megazord.frc7563.subsystems.shooter.Flywheel.FlywheelSubsystem;
 import br.megazord.frc7563.subsystems.shooter.hood.HoodSubsystem;
@@ -26,7 +27,10 @@ public class ShootAimTargetCommand extends Command {
 
   // Called when the command is initially scheduled.
   @Override
-  public void initialize() {}
+  public void initialize() 
+  {
+    RobotState.getInstance().setSwerveDriveMode(DriveMode.SHOOTING);
+  }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
@@ -40,8 +44,9 @@ public class ShootAimTargetCommand extends Command {
   @Override
   public void end(boolean interrupted) 
   {
-    hoodSubsystem.setTargetPositionRads(0);
-    flywheelSubsystem.setVelocityModeRadsPerSec(15);
+    hoodSubsystem.setTargetPositionRads(0.0);
+    flywheelSubsystem.setFlywheelVoltageOut(7);
+    RobotState.getInstance().setSwerveDriveMode(DriveMode.FAST);
   }
 
   // Returns true when the command should end.

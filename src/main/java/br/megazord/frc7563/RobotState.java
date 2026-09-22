@@ -6,6 +6,7 @@ package br.megazord.frc7563;
 
 import org.littletonrobotics.junction.AutoLogOutput;
 
+import br.megazord.frc7563.Constants.DriveConstants.DriveMode;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
@@ -46,6 +47,8 @@ public class RobotState {
 
   private SwerveDrivePoseEstimator poseEstimator;
   private boolean poseEstimatorInitialized = false;
+
+  private DriveMode swerveDriveMode = DriveMode.FAST;
 
   // ---------------------------------------------------------------------
   // Chassis speeds
@@ -201,6 +204,17 @@ public class RobotState {
 
   public Rotation2d getAngularVelocity() {
     return new Rotation2d(measuredChassisSpeeds.omegaRadiansPerSecond);
+  }
+
+  public void setSwerveDriveMode(DriveMode swerveDriveMode)
+  {
+    this.swerveDriveMode = swerveDriveMode;
+  }
+
+  @AutoLogOutput(key = "RobotState/Swerve/DriveMode")
+  public DriveMode getSwerveDriveMode()
+  {
+    return swerveDriveMode;
   }
 
    /**

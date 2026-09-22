@@ -70,9 +70,9 @@ public final class IntakeConstants {
     public static final double kReverseSoftLimitThreshold = 0;
 
     /* positions (rad), ex-articulatorUpAngle/DownAngle/StartAngle */
-    public static final double kStowedPositionRads = 0.4;
-    public static final double kDeployedPositionRads = 2.05;
-    public static final double kStartPositionRads = 2.15;
+    public static final double kStowedPositionRads = 0.04  * 2 * Math.PI;
+    public static final double kDeployedPositionRads = 2.05 * 2 * Math.PI;
+    public static final double kStartPositionRads = 2.15 *  2 * Math.PI;
   }
 
   /** The rollers that grab/eject the game piece. */
