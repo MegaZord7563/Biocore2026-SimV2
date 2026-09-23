@@ -7,14 +7,17 @@ package br.megazord.frc7563.subsystems.shooter.turret;
 import com.ctre.phoenix6.CANBus;
 import com.ctre.phoenix6.StatusCode;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
+import com.ctre.phoenix6.configs.MotionMagicConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.CoastOut;
+import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.controls.NeutralOut;
-import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
+
+import static edu.wpi.first.units.Units.*;
 
 import br.megazord.frc7563.subsystems.shooter.ShooterConstants.Turret;
 import edu.wpi.first.math.util.Units;
@@ -23,7 +26,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 public class TurretIOTalonFX implements TurretIO {
     private final TalonFX turretMotor = new TalonFX(Turret.kMotorId, CANBus.roboRIO());
     // create a position closed-loop request, voltage output, slot 0 configs
-    private final PositionVoltage turretPID = new PositionVoltage(0).withSlot(0);
+    private final MotionMagicVoltage turretPID = new MotionMagicVoltage(0).withSlot(0);
     private final VoltageOut voltageOut = new VoltageOut(0.0);
 
     /* Keep a brake request so we can disable the motor */
@@ -37,8 +40,7 @@ public class TurretIOTalonFX implements TurretIO {
     }
 
     @Override
-    public void updateInputs(TurretIOInputs inputs)
-    {
+    public void updateInputs(TurretIOInputs inputs) {
         inputs.turretConnected = turretMotor.isConnected();
         inputs.turretPositionRads = Units.rotationsToRadians(turretMotor.getPosition().getValueAsDouble());
         inputs.turretVelocityRadsPerSec = Units.rotationsToRadians(turretMotor.getVelocity().getValueAsDouble());
@@ -48,8 +50,7 @@ public class TurretIOTalonFX implements TurretIO {
     }
 
     @Override
-    public void applyOutputs(TurretIOOutputs outputs)
-    {
+    public void applyOutputs(TurretIOOutputs outputs) {
         switch (outputs.mode) {
             case POSITION:
                 turretMotor.setControl(turretPID.withPosition(outputs.targetRotation.getRotations()));
@@ -105,6 +106,13 @@ public class TurretIOTalonFX implements TurretIO {
         toConfigure.SoftwareLimitSwitch.ReverseSoftLimitEnable = Turret.kReverseSoftLimitEnable;
         toConfigure.SoftwareLimitSwitch.ForwardSoftLimitThreshold = Turret.kForwardSoftLimitThreshold;
         toConfigure.SoftwareLimitSwitch.ReverseSoftLimitThreshold = Turret.kReverseSoftLimitThreshold;
+
+        toConfigure.withMotionMagic(
+                new MotionMagicConfigs()
+                        .withMotionMagicCruiseVelocity(RotationsPerSecond.of(12))
+                        .withMotionMagicAcceleration(RotationsPerSecondPerSecond.of(6.0))// 5
+                        .withMotionMagicJerk(RotationsPerSecondPerSecond.per(Second).of(60))// 50
+        );
 
         StatusCode status = StatusCode.StatusCodeNotInitialized;
         for (int i = 0; i < 5; i++) {
