@@ -44,7 +44,9 @@ public class TurretSubsystem extends SubsystemBase {
 
     turretDisconnectedAlert.set(!inputs.turretConnected && RobotConstants.enableAlerts);
 
-    AstroMechanism3d.getInstance().setTurretAngle(getTurretRotation2d());
+    AstroMechanism3d.getInstance().setTurretAngle(
+        getTurretRotation2d()
+    );
   }
 
   public double getAngularPositionRad()
@@ -54,7 +56,7 @@ public class TurretSubsystem extends SubsystemBase {
 
   public Rotation2d getTurretRotation2d()
   {
-    return Rotation2d.fromDegrees(inputs.turretPositionRads).plus(Rotation2d.fromDegrees(90));
+    return Rotation2d.fromRadians(inputs.turretPositionRads).plus(Rotation2d.fromDegrees(90));
   }
 
   public double getSupplyCurrent()

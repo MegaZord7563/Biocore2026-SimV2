@@ -152,7 +152,7 @@ public final class ShooterConstants {
     public static final double kClosedLoopRamp = 0.25;
     public static final double kS = 0.0; // 1.0069 previously
     public static final double kV = 0.0; // 0.0035301 previously
-    public static final double kP = 1000; // 65.619 previously
+    public static final double kP = 65; // 65.619 previously
     public static final double kI = 0;
     public static final double kD = 0;
 

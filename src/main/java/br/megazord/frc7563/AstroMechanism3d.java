@@ -36,6 +36,6 @@ public class AstroMechanism3d {
                 new Transform3d(
                     Translation3d.kZero, new Rotation3d(0.0, 0.0, turretAngle.getRadians())));
 
-    Logger.recordOutput("/Components", turretPose);
+    Logger.recordOutput("/Mechanism3d/Components", turretPose);
   }
 }

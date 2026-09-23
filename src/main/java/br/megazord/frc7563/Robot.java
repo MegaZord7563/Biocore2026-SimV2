@@ -200,6 +200,8 @@ public class Robot extends LoggedRobot {
     Logger.recordOutput("Robot/BatteryVoltage", batteryVoltage);
     Logger.recordOutput("Robot/MatchTime", DriverStation.getMatchTime());
 
+    AstroMechanism3d.getInstance().log();
+
     m_shootCalculator.calculateMovingShot();
     driverJoystickAlert.set(!m_robotContainer.driverJoystick.isConnected());
     // arcadeJoyLeftAlert.set();

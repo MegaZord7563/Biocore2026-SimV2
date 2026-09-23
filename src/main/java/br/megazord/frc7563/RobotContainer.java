@@ -173,7 +173,7 @@ public class RobotContainer {
     // While held, continuously solves for turret/hood/flywheel setpoints that
     // hit the hub from wherever the robot currently is (and however it's
     // currently moving) and drives the mechanisms to them.
-    driverJoystick.rightTrigger(0.5).toggleOnTrue(shootAimTargetCommand).onTrue(new InstantCommand(()-> swerveDrive.setDriveMode(DriveConstants.DriveMode.SHOOTING)));
+    driverJoystick.rightTrigger(0.5).toggleOnTrue(shootAimTargetCommand);
 
     /** Intake Commands */
     driverJoystick.leftTrigger(0.5).onTrue(new InstantCommand(()-> intakeSubsystem.intake(), intakeSubsystem)).onFalse(new InstantCommand(()-> intakeSubsystem.setCoastOut()));
