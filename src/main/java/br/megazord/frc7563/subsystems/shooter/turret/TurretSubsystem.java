@@ -6,6 +6,7 @@ package br.megazord.frc7563.subsystems.shooter.turret;
 
 import org.littletonrobotics.junction.Logger;
 
+import br.megazord.frc7563.AstroMechanism3d;
 import br.megazord.frc7563.Constants.RobotConstants;
 import br.megazord.frc7563.subsystems.shooter.turret.TurretIO.TurretIOOutputs;
 import br.megazord.frc7563.subsystems.shooter.turret.TurretIO.TurretIOOutputsMode;
@@ -42,6 +43,8 @@ public class TurretSubsystem extends SubsystemBase {
     }
 
     turretDisconnectedAlert.set(!inputs.turretConnected && RobotConstants.enableAlerts);
+
+    AstroMechanism3d.getInstance().setTurretAngle(getTurretRotation2d());
   }
 
   public double getAngularPositionRad()
