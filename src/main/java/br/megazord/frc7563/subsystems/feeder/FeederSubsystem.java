@@ -67,7 +67,7 @@ public class FeederSubsystem extends SubsystemBase {
     outputs.velocityRadsPerSec = velocityRadsPerSec;
     io.applyOutputs(outputs);
 
-    Logger.recordOutput("Flywheel/velocitySetpointRadsPerSec", velocityRadsPerSec);
+    Logger.recordOutput("Feeder/velocitySetpointRadsPerSec", velocityRadsPerSec);
   }
 
   public void setFeederVoltageOut(double voltageOut)
