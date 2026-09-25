@@ -13,6 +13,9 @@ import br.megazord.frc7563.subsystems.LedSubsystem;
 import br.megazord.frc7563.subsystems.feeder.FeederIOSim;
 import br.megazord.frc7563.subsystems.feeder.FeederIOTalonFX;
 import br.megazord.frc7563.subsystems.feeder.FeederSubsystem;
+import br.megazord.frc7563.subsystems.indexer.IndexerIOSim;
+import br.megazord.frc7563.subsystems.indexer.IndexerIOTalonFX;
+import br.megazord.frc7563.subsystems.indexer.IndexerSubsystem;
 import br.megazord.frc7563.subsystems.intake.IntakeIOSim;
 import br.megazord.frc7563.subsystems.intake.IntakeIOTalonFX;
 import br.megazord.frc7563.subsystems.intake.IntakeSubsystem;
@@ -57,6 +60,7 @@ public class RobotContainer {
   private HoodSubsystem hoodSubsystem;
   private IntakeSubsystem intakeSubsystem;
   private FeederSubsystem feederSubsystem;
+  private IndexerSubsystem indexerSubsystem;
   public static LedSubsystem ledSubsystem;
 
   //controllers intace
@@ -85,6 +89,7 @@ public class RobotContainer {
         hoodSubsystem = new HoodSubsystem(new HoodIOSim());
         intakeSubsystem = new IntakeSubsystem(new IntakeIOSim());
         feederSubsystem = new FeederSubsystem(new FeederIOSim());
+        indexerSubsystem = new IndexerSubsystem(new IndexerIOSim());
         break;
 
       case REAL:
@@ -127,6 +132,7 @@ public class RobotContainer {
         hoodSubsystem = new HoodSubsystem(new HoodIOTalonFX());
         intakeSubsystem = new IntakeSubsystem(new IntakeIOTalonFX());
         feederSubsystem = new FeederSubsystem(new FeederIOTalonFX());
+        indexerSubsystem = new IndexerSubsystem(new IndexerIOTalonFX());
         break;
 
       default:
@@ -185,7 +191,17 @@ public class RobotContainer {
     driverJoystick.leftTrigger(0.5).onTrue(new InstantCommand(()-> intakeSubsystem.intake(), intakeSubsystem)).onFalse(new InstantCommand(()-> intakeSubsystem.setCoastOut()));
     driverJoystick.b().onTrue(new InstantCommand(()-> intakeSubsystem.outtake(), intakeSubsystem)).onFalse(new InstantCommand(()-> intakeSubsystem.setCoastOut(), intakeSubsystem));
 
-    driverJoystick.a().onFalse(new InstantCommand(()-> feederSubsystem.setFeederVoltageOut(12), feederSubsystem)).onFalse(new InstantCommand(()-> feederSubsystem.setCoastOut(), feederSubsystem));
+    driverJoystick.a().onTrue(new InstantCommand(()-> {
+      feederSubsystem.setFeederVoltageOut(12);
+      indexerSubsystem.runIndexer();
+    }, feederSubsystem, indexerSubsystem)).onFalse(new InstantCommand(()-> {
+      feederSubsystem.setCoastOut();
+      indexerSubsystem.stop();
+    }, feederSubsystem, indexerSubsystem));
+  }
+
+  public IndexerSubsystem getIndexerSubsystem() {
+    return indexerSubsystem;
   }
 
   /**
