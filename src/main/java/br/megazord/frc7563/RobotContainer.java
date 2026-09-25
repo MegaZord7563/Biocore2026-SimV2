@@ -7,7 +7,27 @@ package br.megazord.frc7563;
 import br.megazord.frc7563.Constants.DriveConstants;
 import br.megazord.frc7563.Constants.OIConstants;
 import br.megazord.frc7563.Constants.RobotConstants;
+import br.megazord.frc7563.commands.shooter.ShootAimTargetCommand;
+import br.megazord.frc7563.commands.shooter.TrackTargetTurretActiveCommand;
 import br.megazord.frc7563.subsystems.LedSubsystem;
+import br.megazord.frc7563.subsystems.feeder.FeederIOSim;
+import br.megazord.frc7563.subsystems.feeder.FeederIOTalonFX;
+import br.megazord.frc7563.subsystems.feeder.FeederSubsystem;
+import br.megazord.frc7563.subsystems.indexer.IndexerIOSim;
+import br.megazord.frc7563.subsystems.indexer.IndexerIOTalonFX;
+import br.megazord.frc7563.subsystems.indexer.IndexerSubsystem;
+import br.megazord.frc7563.subsystems.intake.IntakeIOSim;
+import br.megazord.frc7563.subsystems.intake.IntakeIOTalonFX;
+import br.megazord.frc7563.subsystems.intake.IntakeSubsystem;
+import br.megazord.frc7563.subsystems.shooter.Flywheel.FlywheelIOSim;
+import br.megazord.frc7563.subsystems.shooter.Flywheel.FlywheelIOTalonFX;
+import br.megazord.frc7563.subsystems.shooter.Flywheel.FlywheelSubsystem;
+import br.megazord.frc7563.subsystems.shooter.hood.HoodIOSim;
+import br.megazord.frc7563.subsystems.shooter.hood.HoodIOTalonFX;
+import br.megazord.frc7563.subsystems.shooter.hood.HoodSubsystem;
+import br.megazord.frc7563.subsystems.shooter.turret.TurretIOSim;
+import br.megazord.frc7563.subsystems.shooter.turret.TurretIOTalonFX;
+import br.megazord.frc7563.subsystems.shooter.turret.TurretSubsystem;
 import br.megazord.frc7563.subsystems.swerve.Gyro;
 import br.megazord.frc7563.subsystems.swerve.GyroIOPygeon2;
 import br.megazord.frc7563.subsystems.swerve.GyroIOSim;
@@ -35,10 +55,20 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 public class RobotContainer {
   // Subsystems instance
   private SwerveSubsystem swerveDrive;
+  private FlywheelSubsystem flywheelSubsystem;
+  private TurretSubsystem turretSubsystem;
+  private HoodSubsystem hoodSubsystem;
+  private IntakeSubsystem intakeSubsystem;
+  private FeederSubsystem feederSubsystem;
+  private IndexerSubsystem indexerSubsystem;
   public static LedSubsystem ledSubsystem;
 
   //controllers intace
   public final CommandXboxController driverJoystick = new CommandXboxController(0);
+
+  //commands instance 
+  private final TrackTargetTurretActiveCommand trackTargetTurretActiveCommand;
+  private final ShootAimTargetCommand shootAimTargetCommand;
 
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -53,6 +83,13 @@ public class RobotContainer {
                   new SwerveModule(new SwerveModuleIOSim(), "BL"),
                   new SwerveModule(new SwerveModuleIOSim(), "BR"),
                   new Gyro(new GyroIOSim(()-> swerveDrive.getAngularVelocity())));
+
+        flywheelSubsystem = new FlywheelSubsystem(new FlywheelIOSim());
+        turretSubsystem = new TurretSubsystem(new TurretIOSim());
+        hoodSubsystem = new HoodSubsystem(new HoodIOSim());
+        intakeSubsystem = new IntakeSubsystem(new IntakeIOSim());
+        feederSubsystem = new FeederSubsystem(new FeederIOSim());
+        indexerSubsystem = new IndexerSubsystem(new IndexerIOSim());
         break;
 
       case REAL:
@@ -90,13 +127,23 @@ public class RobotContainer {
                   ), 
                   "BR"),
                   new Gyro(new GyroIOPygeon2()));
+        flywheelSubsystem = new FlywheelSubsystem(new FlywheelIOTalonFX());
+        turretSubsystem = new TurretSubsystem(new TurretIOTalonFX());
+        hoodSubsystem = new HoodSubsystem(new HoodIOTalonFX());
+        intakeSubsystem = new IntakeSubsystem(new IntakeIOTalonFX());
+        feederSubsystem = new FeederSubsystem(new FeederIOTalonFX());
+        indexerSubsystem = new IndexerSubsystem(new IndexerIOTalonFX());
         break;
 
       default:
         break;
     }
 
-    ledSubsystem = new LedSubsystem(swerveDrive);
+    ledSubsystem = new LedSubsystem(swerveDrive, 0);
+
+    //Commands Instance
+    trackTargetTurretActiveCommand = new TrackTargetTurretActiveCommand(turretSubsystem);
+    shootAimTargetCommand = new ShootAimTargetCommand(hoodSubsystem, flywheelSubsystem);
 
     swerveDrive.setDefaultCommand(new RunCommand(
         () -> swerveDrive.driveFieldOriented(
@@ -106,7 +153,8 @@ public class RobotContainer {
             () -> driverJoystick.rightStick().getAsBoolean()),
         swerveDrive)// .onlyIf(()-> !driverJoystick.getHID().getXButton())
     );
-    
+    turretSubsystem.setDefaultCommand(trackTargetTurretActiveCommand);
+
     configureBindings();
   }
 
@@ -128,11 +176,32 @@ public class RobotContainer {
   {
     /** Swerve Comands **/
     //speed controls
-    driverJoystick.rightBumper().onTrue(new InstantCommand(()-> swerveDrive.setDriveMode(DriveConstants.DriveMode.FAST), swerveDrive));
-    driverJoystick.leftBumper().onTrue(new InstantCommand(()-> swerveDrive.setDriveMode(DriveConstants.DriveMode.SLOW), swerveDrive));
-    driverJoystick.leftBumper().and(driverJoystick.rightBumper()).onTrue(new InstantCommand(()-> swerveDrive.setDriveMode(DriveConstants.DriveMode.MAX), swerveDrive));
+    driverJoystick.rightBumper().whileTrue(swerveDrive.setDriveModeCommand(DriveConstants.DriveMode.SLOW)).onFalse(swerveDrive.setDriveModeCommand(DriveConstants.DriveMode.FAST));
+    driverJoystick.leftBumper().whileTrue(swerveDrive.setDriveModeCommand(DriveConstants.DriveMode.MAX)).onFalse(swerveDrive.setDriveModeCommand(DriveConstants.DriveMode.FAST));
 
     driverJoystick.start().onTrue(new InstantCommand(()-> swerveDrive.SeedHeadingCamera()).ignoringDisable(true));
+
+    /** Shooter Calculator **/
+    // While held, continuously solves for turret/hood/flywheel setpoints that
+    // hit the hub from wherever the robot currently is (and however it's
+    // currently moving) and drives the mechanisms to them.
+    driverJoystick.rightTrigger(0.5).toggleOnTrue(shootAimTargetCommand);
+
+    /** Intake Commands */
+    driverJoystick.leftTrigger(0.5).onTrue(new InstantCommand(()-> intakeSubsystem.intake(), intakeSubsystem)).onFalse(new InstantCommand(()-> intakeSubsystem.setCoastOut()));
+    driverJoystick.b().onTrue(new InstantCommand(()-> intakeSubsystem.outtake(), intakeSubsystem)).onFalse(new InstantCommand(()-> intakeSubsystem.setCoastOut(), intakeSubsystem));
+
+    driverJoystick.a().onTrue(new InstantCommand(()-> {
+      feederSubsystem.setFeederVoltageOut(12);
+      indexerSubsystem.runIndexer();
+    }, feederSubsystem, indexerSubsystem)).onFalse(new InstantCommand(()-> {
+      feederSubsystem.setCoastOut();
+      indexerSubsystem.stop();
+    }, feederSubsystem, indexerSubsystem));
+  }
+
+  public IndexerSubsystem getIndexerSubsystem() {
+    return indexerSubsystem;
   }
 
   /**
@@ -141,7 +210,6 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-    // An example command will be run in autonomous
     return null;
   }
 

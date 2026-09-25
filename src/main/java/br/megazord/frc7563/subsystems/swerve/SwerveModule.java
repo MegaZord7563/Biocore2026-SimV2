@@ -39,9 +39,8 @@ public class SwerveModule {
     }
 
     public void periodic() {
-        io.applyOutputs(outputs);
         io.updateInputs(inputs);
-        Logger.processInputs("SwerveDrive/Module" + position, inputs);
+        Logger.processInputs("Drive/Module" + position, inputs);
 
         driveDisconnectedAlert.set(!inputs.driveConnected && RobotConstants.enableAlerts);
         turnDisconnectedAlert.set(!inputs.turnConnected && RobotConstants.enableAlerts);
@@ -67,6 +66,8 @@ public class SwerveModule {
                 .metersPerSecToWheelRotationsPerSec(correctState.speedMetersPerSecond);
         outputs.driveVelocityRadPerSec = Units.rotationsToRadians(speedRotationsPerSecond);
         outputs.turnRotation = correctState.angle;
+
+        io.applyOutputs(outputs);
     }
 
     public SwerveModuleState getDesiredState() {
@@ -80,18 +81,21 @@ public class SwerveModule {
         outputs.mode = SwerveModuleIOOutputMode.CHARACTERIZE;
         outputs.driveCharacterizationOutput = output;
         outputs.turnRotation = Rotation2d.kZero;
+        io.applyOutputs(outputs);
     }
 
     /** Disables all motor outputs in brake mode. */
     public void brake() {
-        outputs.mode = SwerveModuleIOOutputMode.BRAKE;
+        outputs.mode = SwerveModuleIOOutputMode.BREAK;
         outputs.driveVelocityRadPerSec = 0.0;
+        io.applyOutputs(outputs);
     }
 
     /** Disables all motor outputs in coast mode. */
     public void coast() {
         outputs.mode = SwerveModuleIOOutputMode.COAST;
         outputs.driveVelocityRadPerSec = 0.0;
+        io.applyOutputs(outputs);
     }
 
     /** Returns whether the motors are connected. */

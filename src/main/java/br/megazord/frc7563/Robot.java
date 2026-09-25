@@ -26,6 +26,7 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 // local imports
 import br.megazord.frc7563.Constants.RobotConstants;
 import br.megazord.frc7563.build.BuildConstants;
+import br.megazord.frc7563.subsystems.shooter.ShootCalculator;
 import br.megazord.frc7563.util.Elastic;
 
 /**
@@ -40,6 +41,7 @@ public class Robot extends LoggedRobot {
   private Command m_testCommand;
 
   private final RobotContainer m_robotContainer;
+  private ShootCalculator m_shootCalculator = ShootCalculator.getInstance();
 
   private double autoStart;
   private boolean autoMessagePrinted;
@@ -70,10 +72,7 @@ public class Robot extends LoggedRobot {
   public Robot() {
     super(RobotConstants.loopPeriodSecs);
 
-    // Instantiate our RobotContainer. This will perform all our button bindings,
-    // and put our
-    // autonomous chooser on the dashboard.
-    m_robotContainer = new RobotContainer();
+   
 
     Logger.recordMetadata("RobotVersion", RobotConstants.robotVerion);
     Logger.recordMetadata("ProjectName", BuildConstants.MAVEN_NAME);
@@ -145,6 +144,8 @@ public class Robot extends LoggedRobot {
 
     Logger.start(); // Start logging! No more data receivers, replay sources, or metadata values may
     // be added.
+
+    m_robotContainer = new RobotContainer();
   }
 
   /**
@@ -198,6 +199,9 @@ public class Robot extends LoggedRobot {
     Logger.recordOutput("Robot/BatteryVoltage", batteryVoltage);
     Logger.recordOutput("Robot/MatchTime", DriverStation.getMatchTime());
 
+    AstroMechanism3d.getInstance().log();
+
+    m_shootCalculator.calculateMovingShot();
     driverJoystickAlert.set(!m_robotContainer.driverJoystick.isConnected());
     // arcadeJoyLeftAlert.set();
     // arcadeJoyRightAlert.set();

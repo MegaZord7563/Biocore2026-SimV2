@@ -38,6 +38,7 @@ import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.DeferredCommand;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 //PathPlanner Imports
@@ -59,8 +60,6 @@ public class SwerveSubsystem extends SubsystemBase {
   private final RobotState robotState = RobotState.getInstance();
 
   private SwerveModuleState[] desiredStates = new SwerveModuleState[4];
-
-  private DriveMode driveMode = DriveMode.SLOW;
 
   /** Limelight seed */
   private boolean isAllianceReset = false;
@@ -234,19 +233,15 @@ public class SwerveSubsystem extends SubsystemBase {
   }
 
   public void setDriveMode(DriveMode mode) {
-    this.driveMode = mode;
-
-    for (int i = 0; i < modules.length; i++) {
-      System.out.println("Setting drive mode for module " + i + " to " + mode + "!");
-    }
+    robotState.setSwerveDriveMode(mode);
   }
 
-  public double getDriveSpeed() {
-    return driveMode.getSpeedValue();
+  public double getDriveSpeedValue() {
+    return robotState.getSwerveDriveMode().getSpeedValue();
   }
 
   public DriveMode getDriveMode() {
-    return driveMode;
+    return robotState.getSwerveDriveMode();
   }
 
   @AutoLogOutput(key = "Drive/Gyro/Rotation2d")
@@ -416,8 +411,8 @@ public class SwerveSubsystem extends SubsystemBase {
     boolean joystickButton = joystickButtonFunction.get();
 
     // 3. Make the driving smoother
-    xSpeed = xLimiter.calculate(xSpeed) * DriveConstants.kTeleDriveMaxSpeedMetersPerSecond * driveMode.getSpeedValue();
-    ySpeed = yLimiter.calculate(ySpeed) * DriveConstants.kTeleDriveMaxSpeedMetersPerSecond * driveMode.getSpeedValue();
+    xSpeed = xLimiter.calculate(xSpeed) * DriveConstants.kTeleDriveMaxSpeedMetersPerSecond * getDriveSpeedValue();
+    ySpeed = yLimiter.calculate(ySpeed) * DriveConstants.kTeleDriveMaxSpeedMetersPerSecond * getDriveSpeedValue();
     turningSpeed = turningLimiter.calculate(turningSpeed) * DriveConstants.kTeleDriveMaxAngularSpeedRadiansPerSecond
         * (!joystickButton ? 0.75 : 0.95);
 
@@ -502,6 +497,11 @@ public class SwerveSubsystem extends SubsystemBase {
    */
   public Pose2d getPoseEstimator() {
     return robotState.getEstimatedPose();
+  }
+
+  public Command setDriveModeCommand(DriveMode mode)
+  {
+    return new InstantCommand(()-> setDriveMode(mode));
   }
 
   /**

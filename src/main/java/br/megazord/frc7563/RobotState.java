@@ -6,6 +6,7 @@ package br.megazord.frc7563;
 
 import org.littletonrobotics.junction.AutoLogOutput;
 
+import br.megazord.frc7563.Constants.DriveConstants.DriveMode;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
@@ -46,6 +47,8 @@ public class RobotState {
 
   private SwerveDrivePoseEstimator poseEstimator;
   private boolean poseEstimatorInitialized = false;
+
+  private DriveMode swerveDriveMode = DriveMode.FAST;
 
   // ---------------------------------------------------------------------
   // Chassis speeds
@@ -201,5 +204,61 @@ public class RobotState {
 
   public Rotation2d getAngularVelocity() {
     return new Rotation2d(measuredChassisSpeeds.omegaRadiansPerSecond);
+  }
+
+  public void setSwerveDriveMode(DriveMode swerveDriveMode)
+  {
+    this.swerveDriveMode = swerveDriveMode;
+  }
+
+  @AutoLogOutput(key = "RobotState/Swerve/DriveMode")
+  public DriveMode getSwerveDriveMode()
+  {
+    return swerveDriveMode;
+  }
+
+   /**
+   * Checks if the robot is within the neutral shooting zone on the field.
+   * This method uses the robot's current estimated pose to determine if it is
+   * within a predefined area of the field that is considered the neutral shooting
+   * zone.
+   * The specific boundaries of the neutral shooting zone should be defined based
+   * on the field layout and game requirements. In this example, we assume the
+   * neutral shooting zone is a rectangular area defined by certain X and Y
+   * limits.
+   * Adjust the boundaries in the code as needed to match the actual dimensions of
+   * the neutral shooting zone
+   * 
+   * @return true if the robot is inside the neutral shooting zone, false
+   *         otherwise
+   */
+  public boolean isInsideNeutralShootingZone() {
+    Pose2d currentPose = getEstimatedPose();
+    double x = currentPose.getX();
+    // Define the boundaries of the neutral shooting zone (example values, adjust as
+    // needed)
+    boolean withinX = (x >= 5.7 && x <= 9.66);
+
+    return withinX;
+  }
+
+   /**
+   * Define boundaries of trench area
+   * 
+   * @return true if robot is close to any trench, otherwise is false
+   */
+  public boolean isNearTrench() {
+    Pose2d currentPose = getEstimatedPose();
+    double x = currentPose.getX();
+    double y = currentPose.getY();
+    boolean withinXblue = (x >= 3.67 && x <= 5.39);// 3.97 e 5.09
+    boolean withinYblueL = (y >= 6.7 && y <= 8.0);// 6.8 e 8.0
+    boolean withinYblueR = (y >= 0.0 && y <= 1.36);
+    boolean withinXred = (x >= 11.26 && x <= 12.56);
+    boolean withinYredL = (y >= 0.0 && y <= 1.36);// 0 e 1.26
+    boolean withinYredR = (y >= 6.7 && y <= 8.0);
+    boolean blueTrenchArea = (withinXblue && withinYblueL) || (withinXblue && withinYblueR);
+    boolean redTrenchArea = (withinXred && withinYredL) || (withinXred && withinYredR);
+    return blueTrenchArea || redTrenchArea;
   }
 }

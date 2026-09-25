@@ -21,7 +21,7 @@ public interface SwerveModuleIO
     public double driveVelocityRadsPerSec = 0.0;
     public double driveAppliedVolts = 0.0;
     public double driveSupplyCurrentAmps = 0.0;
-    public double driveTempCelsius;
+    public double driveTempCelsius = 0.0;
 
     public boolean turnConnected = false;
     public Rotation2d turnAbsolutePositionRads = Rotation2d.kZero;
@@ -29,7 +29,7 @@ public interface SwerveModuleIO
     public double turnVelocityRadsPerSec = 0.0;
     public double turnAppliedVolts = 0.0;
     public double turnSupplyCurrentAmps = 0.0;
-    public double turnTempCelsius;
+    public double turnTempCelsius = 0.0;
 
     public boolean cancoderConnected = false;
     public double chassisAngularOffset = 0.0;
@@ -37,7 +37,7 @@ public interface SwerveModuleIO
 
   public static enum SwerveModuleIOOutputMode {
     COAST,
-    BRAKE,
+    BREAK,
     DRIVE,
     CHARACTERIZE
   }
