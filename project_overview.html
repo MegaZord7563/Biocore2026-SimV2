@@ -1,0 +1,1134 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Biocore2026-SimV2 | Análise Completa da Branch dev — FRC 7563 Megazord</title>
+  <style>
+    :root {
+      --bg-base: #0a0d14;
+      --bg-card: #121824;
+      --bg-card-hover: #172033;
+      --bg-card-alt: #1a2236;
+      --border-color: #24314d;
+      --border-focus: #00f0ff;
+      --text-main: #f1f5f9;
+      --text-muted: #94a3b8;
+      --text-subtle: #64748b;
+      --neon-purple: #a855f7;
+      --neon-purple-glow: rgba(168, 85, 247, 0.25);
+      --neon-cyan: #00f0ff;
+      --neon-cyan-glow: rgba(0, 240, 255, 0.2);
+      --neon-emerald: #10b981;
+      --neon-emerald-glow: rgba(16, 185, 129, 0.2);
+      --neon-amber: #f59e0b;
+      --neon-amber-glow: rgba(245, 158, 11, 0.2);
+      --neon-rose: #f43f5e;
+      --neon-rose-glow: rgba(244, 63, 94, 0.2);
+      --font-family: 'Segoe UI', system-ui, -apple-system, Roboto, sans-serif;
+      --font-code: 'Consolas', 'Fira Code', 'Courier New', monospace;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg-base);
+      color: var(--text-main);
+      font-family: var(--font-family);
+      line-height: 1.6;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* Ambient Background Glow */
+    .ambient-glow {
+      position: fixed;
+      top: -200px;
+      right: -200px;
+      width: 600px;
+      height: 600px;
+      background: radial-gradient(circle, var(--neon-purple-glow) 0%, transparent 70%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .ambient-glow-2 {
+      position: fixed;
+      bottom: -200px;
+      left: -200px;
+      width: 600px;
+      height: 600px;
+      background: radial-gradient(circle, var(--neon-cyan-glow) 0%, transparent 70%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .container {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 2.5rem 1.5rem;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* Header */
+    header {
+      border-bottom: 1px solid var(--border-color);
+      padding-bottom: 2rem;
+      margin-bottom: 2rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+    }
+
+    .header-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .brand-group {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .team-badge {
+      background: linear-gradient(135deg, #7c3aed, #06b6d4);
+      color: #fff;
+      font-weight: 800;
+      font-size: 1.1rem;
+      padding: 0.35rem 0.85rem;
+      border-radius: 8px;
+      letter-spacing: 0.5px;
+      box-shadow: 0 4px 15px rgba(124, 58, 237, 0.4);
+    }
+
+    .branch-pill {
+      background: rgba(16, 185, 129, 0.15);
+      border: 1px solid var(--neon-emerald);
+      color: var(--neon-emerald);
+      padding: 0.25rem 0.75rem;
+      border-radius: 9999px;
+      font-size: 0.85rem;
+      font-family: var(--font-code);
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .branch-pill::before {
+      content: '';
+      width: 8px;
+      height: 8px;
+      background: var(--neon-emerald);
+      border-radius: 50%;
+      box-shadow: 0 0 8px var(--neon-emerald);
+    }
+
+    h1 {
+      font-size: 2.5rem;
+      font-weight: 800;
+      background: linear-gradient(to right, #ffffff, #cbd5e1, #a855f7);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      letter-spacing: -0.5px;
+    }
+
+    .subtitle {
+      color: var(--text-muted);
+      font-size: 1.1rem;
+      max-width: 900px;
+    }
+
+    /* Badges Bar */
+    .badges-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.6rem;
+      align-items: center;
+    }
+
+    .tech-tag {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      color: var(--text-muted);
+      font-size: 0.8rem;
+      padding: 0.3rem 0.7rem;
+      border-radius: 6px;
+      font-weight: 500;
+      transition: all 0.2s ease;
+    }
+
+    .tech-tag:hover {
+      border-color: var(--neon-cyan);
+      color: var(--text-main);
+      transform: translateY(-1px);
+    }
+
+    /* Summary Stats Grid */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1.25rem;
+      margin-bottom: 2.5rem;
+    }
+
+    .stat-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 1.25rem;
+      position: relative;
+      overflow: hidden;
+      transition: transform 0.2s ease, border-color 0.2s ease;
+    }
+
+    .stat-card:hover {
+      transform: translateY(-3px);
+      border-color: var(--border-focus);
+    }
+
+    .stat-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 4px;
+      height: 100%;
+    }
+
+    .stat-card.purple::before { background: var(--neon-purple); }
+    .stat-card.cyan::before { background: var(--neon-cyan); }
+    .stat-card.emerald::before { background: var(--neon-emerald); }
+    .stat-card.amber::before { background: var(--neon-amber); }
+
+    .stat-label {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 0.35rem;
+      font-weight: 600;
+    }
+
+    .stat-value {
+      font-size: 1.85rem;
+      font-weight: 800;
+      color: #fff;
+    }
+
+    .stat-desc {
+      font-size: 0.82rem;
+      color: var(--text-subtle);
+      margin-top: 0.4rem;
+    }
+
+    /* Nav Tabs */
+    .tabs-nav {
+      display: flex;
+      gap: 0.5rem;
+      border-bottom: 1px solid var(--border-color);
+      margin-bottom: 2rem;
+      overflow-x: auto;
+      padding-bottom: 0.25rem;
+    }
+
+    .tab-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      padding: 0.75rem 1.25rem;
+      font-size: 1rem;
+      font-weight: 600;
+      border-radius: 8px 8px 0 0;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      transition: all 0.2s ease;
+      white-space: nowrap;
+      position: relative;
+    }
+
+    .tab-btn:hover {
+      color: var(--text-main);
+      background: rgba(255, 255, 255, 0.03);
+    }
+
+    .tab-btn.active {
+      color: var(--neon-cyan);
+      background: var(--bg-card);
+    }
+
+    .tab-btn.active::after {
+      content: '';
+      position: absolute;
+      bottom: -0.25rem;
+      left: 0;
+      width: 100%;
+      height: 2px;
+      background: var(--neon-cyan);
+      box-shadow: 0 0 10px var(--neon-cyan);
+    }
+
+    /* Tab Content Panels */
+    .tab-panel {
+      display: none;
+      animation: fadeIn 0.3s ease;
+    }
+
+    .tab-panel.active {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Cards & Grids */
+    .grid-2 {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(460px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+    }
+
+    @media (max-width: 768px) {
+      .grid-2 {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 14px;
+      padding: 1.75rem;
+      position: relative;
+    }
+
+    .card-title {
+      font-size: 1.25rem;
+      font-weight: 700;
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      color: #fff;
+    }
+
+    .card-title .icon {
+      font-size: 1.4rem;
+    }
+
+    .card p {
+      color: var(--text-muted);
+      margin-bottom: 1rem;
+    }
+
+    /* Mechanism Pipeline Diagram */
+    .pipeline-container {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 14px;
+      padding: 1.75rem;
+      margin-bottom: 2rem;
+    }
+
+    .pipeline-track {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 1rem;
+      margin: 1.5rem 0;
+    }
+
+    .pipeline-step {
+      background: var(--bg-card-alt);
+      border: 1px solid var(--border-color);
+      padding: 1rem 1.25rem;
+      border-radius: 10px;
+      flex: 1;
+      min-width: 170px;
+      text-align: center;
+      position: relative;
+      transition: all 0.2s ease;
+    }
+
+    .pipeline-step:hover {
+      border-color: var(--neon-cyan);
+      transform: translateY(-2px);
+    }
+
+    .pipeline-step.ready {
+      border-color: rgba(16, 185, 129, 0.4);
+    }
+
+    .pipeline-step.missing {
+      border-color: var(--neon-rose);
+      background: rgba(244, 63, 94, 0.08);
+    }
+
+    .pipeline-step .step-title {
+      font-weight: 700;
+      font-size: 1rem;
+      color: #fff;
+    }
+
+    .pipeline-step .step-sub {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      margin-top: 0.25rem;
+    }
+
+    .pipeline-step .step-status {
+      display: inline-block;
+      margin-top: 0.5rem;
+      font-size: 0.72rem;
+      padding: 0.2rem 0.5rem;
+      border-radius: 4px;
+      font-weight: 600;
+    }
+
+    .step-status.ok {
+      background: rgba(16, 185, 129, 0.2);
+      color: var(--neon-emerald);
+    }
+
+    .step-status.pendente {
+      background: rgba(244, 63, 94, 0.2);
+      color: var(--neon-rose);
+    }
+
+    .pipeline-arrow {
+      color: var(--text-subtle);
+      font-size: 1.4rem;
+      font-weight: bold;
+    }
+
+    /* List items */
+    .feature-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 0.85rem;
+    }
+
+    .feature-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.85rem;
+      background: var(--bg-card-alt);
+      padding: 1rem 1.2rem;
+      border-radius: 10px;
+      border: 1px solid transparent;
+      transition: border-color 0.2s ease;
+    }
+
+    .feature-item:hover {
+      border-color: var(--border-color);
+    }
+
+    .feature-icon {
+      font-size: 1.25rem;
+      flex-shrink: 0;
+      line-height: 1.4;
+    }
+
+    .feature-text strong {
+      color: #fff;
+      display: block;
+      margin-bottom: 0.2rem;
+    }
+
+    .feature-text {
+      color: var(--text-muted);
+      font-size: 0.92rem;
+    }
+
+    /* Alerts */
+    .alert-box {
+      border-radius: 10px;
+      padding: 1.2rem 1.4rem;
+      margin-bottom: 1.25rem;
+      display: flex;
+      gap: 1rem;
+      align-items: flex-start;
+    }
+
+    .alert-box.danger {
+      background: rgba(244, 63, 94, 0.1);
+      border: 1px solid var(--neon-rose);
+    }
+
+    .alert-box.warning {
+      background: rgba(245, 158, 11, 0.1);
+      border: 1px solid var(--neon-amber);
+    }
+
+    .alert-box.info {
+      background: rgba(0, 240, 255, 0.1);
+      border: 1px solid var(--neon-cyan);
+    }
+
+    .alert-box.success {
+      background: rgba(16, 185, 129, 0.1);
+      border: 1px solid var(--neon-emerald);
+    }
+
+    .alert-box .alert-icon {
+      font-size: 1.4rem;
+      flex-shrink: 0;
+    }
+
+    .alert-box .alert-content h4 {
+      color: #fff;
+      margin-bottom: 0.35rem;
+      font-size: 1.05rem;
+    }
+
+    .alert-box .alert-content p {
+      color: var(--text-muted);
+      font-size: 0.9rem;
+      margin-bottom: 0;
+    }
+
+    /* Code Snippets */
+    .code-block {
+      background: #080b11;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 1rem;
+      font-family: var(--font-code);
+      font-size: 0.85rem;
+      color: #e2e8f0;
+      overflow-x: auto;
+      margin: 0.75rem 0;
+      line-height: 1.5;
+    }
+
+    .code-diff-remove {
+      background: rgba(244, 63, 94, 0.18);
+      color: #fca5a5;
+      display: block;
+      padding: 0.1rem 0.4rem;
+      border-radius: 3px;
+    }
+
+    .code-diff-add {
+      background: rgba(16, 185, 129, 0.18);
+      color: #86efac;
+      display: block;
+      padding: 0.1rem 0.4rem;
+      border-radius: 3px;
+    }
+
+    /* Subsystem Status Table */
+    .table-container {
+      overflow-x: auto;
+      margin-top: 1rem;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+    }
+
+    th {
+      background: var(--bg-card-alt);
+      color: var(--text-muted);
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      padding: 0.85rem 1rem;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    td {
+      padding: 0.9rem 1rem;
+      border-bottom: 1px solid var(--border-color);
+      font-size: 0.9rem;
+      color: var(--text-muted);
+    }
+
+    tr:hover td {
+      background: rgba(255, 255, 255, 0.02);
+      color: var(--text-main);
+    }
+
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 0.2rem 0.55rem;
+      border-radius: 4px;
+    }
+
+    .status-badge.implemented {
+      background: rgba(16, 185, 129, 0.15);
+      color: var(--neon-emerald);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+    }
+
+    .status-badge.pending {
+      background: rgba(244, 63, 94, 0.15);
+      color: var(--neon-rose);
+      border: 1px solid rgba(244, 63, 94, 0.3);
+    }
+
+    /* Footer */
+    footer {
+      margin-top: 4rem;
+      border-top: 1px solid var(--border-color);
+      padding: 2rem 0;
+      text-align: center;
+      color: var(--text-subtle);
+      font-size: 0.88rem;
+    }
+
+    footer a {
+      color: var(--neon-cyan);
+      text-decoration: none;
+    }
+
+    footer a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="ambient-glow"></div>
+  <div class="ambient-glow-2"></div>
+
+  <div class="container">
+
+    <!-- Header -->
+    <header>
+      <div class="header-top">
+        <div class="brand-group">
+          <div class="team-badge">FRC 7563 MEGAZORD</div>
+          <div class="branch-pill">Branch: dev</div>
+        </div>
+        <div class="badges-row">
+          <span class="tech-tag">WPILib 2026.2.1</span>
+          <span class="tech-tag">AdvantageKit 3.x</span>
+          <span class="tech-tag">Phoenix 6 (Kraken X60)</span>
+          <span class="tech-tag">PathPlannerLib</span>
+          <span class="tech-tag">URCL</span>
+          <span class="tech-tag">Java 17</span>
+        </div>
+      </div>
+      <div>
+        <h1>Biocore2026-SimV2 — Análise de Engenharia</h1>
+        <p class="subtitle">Diagnóstico completo do software na branch <code>dev</code>: mecatrônica operacional, telemetria 3D, cálculos balísticos dinâmicos, pontos fortes de arquitetura e mapeamento cirúrgico de melhorias para a temporada 2026/2027.</p>
+      </div>
+    </header>
+
+    <!-- Stats Overview -->
+    <div class="stats-grid">
+      <div class="stat-card cyan">
+        <div class="stat-label">Loop de Controle</div>
+        <div class="stat-value">100 Hz</div>
+        <div class="stat-desc">Período de 10ms (LoggedRobot determinístico)</div>
+      </div>
+      <div class="stat-card emerald">
+        <div class="stat-label">Subsistemas Ativos</div>
+        <div class="stat-value">6 de 7</div>
+        <div class="stat-desc">Swerve, Turret, Hood, Flywheel, Feeder, Intake</div>
+      </div>
+      <div class="stat-card amber">
+        <div class="stat-label">Subsistema Pendente</div>
+        <div class="stat-value">Indexer</div>
+        <div class="stat-desc">Falta conectar Intake ➔ Feeder (branch feat/indexer)</div>
+      </div>
+      <div class="stat-card purple">
+        <div class="stat-label">Shooting on the Fly</div>
+        <div class="stat-value">Ativo</div>
+        <div class="stat-desc">ShootCalculator com ToFMap e compensação vetorial</div>
+      </div>
+    </div>
+
+    <!-- Navigation Tabs -->
+    <nav class="tabs-nav">
+      <button class="tab-btn active" onclick="switchTab('funcionamento')">⚙️ Funcionamento do Robô</button>
+      <button class="tab-btn" onclick="switchTab('pontos-fortes')">💎 O Que Está Bom</button>
+      <button class="tab-btn" onclick="switchTab('melhorias')">⚠️ Melhorias & Bugs</button>
+      <button class="tab-btn" onclick="switchTab('pipeline')">🎯 Pipeline da Peça & Indexer</button>
+      <button class="tab-btn" onclick="switchTab('tabela')">📋 Matriz de Subsistemas</button>
+    </nav>
+
+    <!-- TAB 1: FUNCIONAMENTO DO ROBÔ -->
+    <section id="funcionamento" class="tab-panel active">
+      <div class="grid-2">
+
+        <!-- Card Swerve & Condução -->
+        <div class="card">
+          <div class="card-title">
+            <span class="icon">🚗</span>
+            <span>Drivetrain Swerve & Modos de Velocidade</span>
+          </div>
+          <p>O robô é equipado com 4 módulos de acionamento holonômico independentes (FL, FR, BL, BR), controlados em coordenadas de campo (<strong>Field-Oriented</strong>) via giroscópio Pigeon 2 (ou <code>GyroIOSim</code> em simulação).</p>
+          <ul class="feature-list">
+            <li class="feature-item">
+              <span class="feature-icon">🕹️</span>
+              <div class="feature-text">
+                <strong>Deadband Suave & Resposta Linear</strong>
+                Aplica deadband de 10% nos analógicos esquerdo e direito para evitar arraste ou ruído de leitura quando os analógicos estão em repouso.
+              </div>
+            </li>
+            <li class="feature-item">
+              <span class="feature-icon">⚡</span>
+              <div class="feature-text">
+                <strong>Perfis de Condução Dinâmicos (Bumpers)</strong>
+                No <code>RobotContainer.java</code>, segurar o bumper esquerdo aciona o modo <code>MAX</code>, segurar o bumper direito aciona o modo <code>SLOW</code> (alinhamento fino), e soltar ambos retorna ao modo <code>FAST</code>.
+              </div>
+            </li>
+            <li class="feature-item">
+              <span class="feature-icon">🧭</span>
+              <div class="feature-text">
+                <strong>Heading Reset / Seeding</strong>
+                O botão <code>Start</code> executa <code>swerveDrive.SeedHeadingCamera()</code> para recalibrar instantaneamente o zero do giroscópio.
+              </div>
+            </li>
+          </ul>
+        </div>
+
+        <!-- Card Sistema de Disparo -->
+        <div class="card">
+          <div class="card-title">
+            <span class="icon">🎯</span>
+            <span>Shooting on the Fly (SOTF) & ShootCalculator</span>
+          </div>
+          <p>O robô conta com um dos sistemas mais sofisticados de mira contínua em movimento da FRC. O atirador é composto por 3 eixos independentes trabalhando em conjunto:</p>
+          <ul class="feature-list">
+            <li class="feature-item">
+              <span class="feature-icon">🔄</span>
+              <div class="feature-text">
+                <strong>Turret com Rastreamento Ativo Contínuo</strong>
+                O comando padrão <code>TrackTargetTurretActiveCommand</code> roda em background permanentemente, mantendo a torreta virada para o Hub mesmo com o robô rodopiando ou translacionando.
+              </div>
+            </li>
+            <li class="feature-item">
+              <span class="feature-icon">📐</span>
+              <div class="feature-text">
+                <strong>Predição Vetorial de Deslocamento (ToF)</strong>
+                O <code>ShootCalculator</code> consulta a tabela de tempo de voo (<code>ToFMap</code>). Ele soma o vetor da velocidade do robô multiplicada pelo tempo de voo para mirar onde o alvo <em>estará</em> no momento do impacto.
+              </div>
+            </li>
+            <li class="feature-item">
+              <span class="feature-icon">🏹</span>
+              <div class="feature-text">
+                <strong>Hood & Flywheel Interpolados</strong>
+                O ângulo do capô (Hood) e a rotação das rodas de tiro (Flywheel) são calculados por curvas polinomiais/interpolação cúbica com base na distância corrigida.
+              </div>
+            </li>
+          </ul>
+        </div>
+
+        <!-- Card Intake & Feeder -->
+        <div class="card">
+          <div class="card-title">
+            <span class="icon">📥</span>
+            <span>Intake e Feeder (Coleta e Alimentação)</span>
+          </div>
+          <p>O fluxo de entrada de peças conta com tratamento mecânico avançado para evitar danos estruturais em caso de batidas:</p>
+          <ul class="feature-list">
+            <li class="feature-item">
+              <span class="feature-icon">🛡️</span>
+              <div class="feature-text">
+                <strong>Intake com Auto-Coast</strong>
+                Acionado pelo gatilho esquerdo (<code>leftTrigger</code>). Ao soltar o gatilho, ele transita imediatamente para <code>setCoastOut()</code>, reduzindo a rigidez motora e preservando o conjunto caso o robô colida contra o obstáculo ou outro robô.
+              </div>
+            </li>
+            <li class="feature-item">
+              <span class="feature-icon">🌪️</span>
+              <div class="feature-text">
+                <strong>Feeder de Alta Rotação (100 RPS)</strong>
+                Dois motores (líder ID 15 e seguidor ID 22) aceleram a peça para injetá-la diretamente nas rodas do Flywheel.
+              </div>
+            </li>
+          </ul>
+        </div>
+
+        <!-- Card Telemetria e 3D -->
+        <div class="card">
+          <div class="card-title">
+            <span class="icon">👓</span>
+            <span>Visualização 3D e Diagnóstico em Tempo Real</span>
+          </div>
+          <p>O projeto foi construído sob a filosofia <em>Simulation-First</em>, permitindo testes sem robô físico:</p>
+          <ul class="feature-list">
+            <li class="feature-item">
+              <span class="feature-icon">🤖</span>
+              <div class="feature-text">
+                <strong>AstroMechanism3d (AdvantageScope)</strong>
+                Publica a cinemática 3D da torreta e dos mecanismos nas NetworkTables para renderização no AdvantageScope com modelo visual tridimensional do robô.
+              </div>
+            </li>
+            <li class="feature-item">
+              <span class="feature-icon">🚨</span>
+              <div class="feature-text">
+                <strong>Alertas e Proteção de Bateria</strong>
+                O <code>Robot.java</code> monitora a tensão da bateria a cada loop e aciona alertas críticos na Driver Station se a tensão cair abaixo de 11.0V, além de monitorar conexões USB de joysticks.
+              </div>
+            </li>
+          </ul>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- TAB 2: PONTOS FORTES -->
+    <section id="pontos-fortes" class="tab-panel">
+      <div class="alert-box success">
+        <div class="alert-icon">✨</div>
+        <div class="alert-content">
+          <h4>Excelência em Arquitetura de Software</h4>
+          <p>A branch <code>dev</code> do Biocore2026-SimV2 utiliza padrões de design de ponta compatíveis com as melhores equipes mundiais da FRC (FIRST Robotics Competition).</p>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-title">
+            <span class="icon">🏛️</span>
+            <span>1. Padrão AdvantageKit IO Desacoplado</span>
+          </div>
+          <p>Todos os subsistemas principais (<strong>SwerveModule, Gyro, Turret, Hood, Flywheel, Feeder, Intake</strong>) seguem estritamente a divisão:</p>
+          <div class="code-block">
+Subsystem (Lógica pura, comandos, controle de estado)
+  └── Interface *IO (Entradas e Saídas genéricas)
+       ├── *IOSim (Física, simulação de inércia com DCMotorSim)
+       └── *IOTalonFX (Comunicação real via CAN Bus CTRE Phoenix 6)
+          </div>
+          <p style="margin-top: 0.5rem; font-size: 0.88rem;">Isso permite alternar instantaneamente entre teste no robô real e simulação no PC apenas alterando a constante de modo (<code>RobotConstants.robotMode</code>).</p>
+        </div>
+
+        <div class="card">
+          <div class="card-title">
+            <span class="icon">🧠</span>
+            <span>2. Singleton de Estado Centralizado (RobotState)</span>
+          </div>
+          <p>O <code>RobotState.java</code> é a <strong>única fonte da verdade</strong> para pose estimation (odometria + visão) e velocidades do chassi:</p>
+          <ul class="feature-list">
+            <li class="feature-item">
+              <span class="feature-icon">✔️</span>
+              <div class="feature-text">
+                <strong>Zero Acoplamento Cíclico</strong>
+                Comandos de tiro e dashboards leem poses e velocidades direto de <code>RobotState.getInstance()</code>, sem precisar invocar métodos internos do <code>SwerveSubsystem</code>.
+              </div>
+            </li>
+            <li class="feature-item">
+              <span class="feature-icon">✔️</span>
+              <div class="feature-text">
+                <strong>PoseEstimator com Filtro de Kalman</strong>
+                Utiliza <code>SwerveDrivePoseEstimator</code> configurado com desvios padrão para odometria (0.015m) e visão (0.15m).
+              </div>
+            </li>
+          </ul>
+        </div>
+
+        <div class="card">
+          <div class="card-title">
+            <span class="icon">🔌</span>
+            <span>3. Proteção Elétrica e Gerenciamento de Corrente</span>
+          </div>
+          <p>Cada motor Kraken X60 e TalonFX possui limites rigorosos de corrente configurados nos arquivos de constantes e nas classes IO:</p>
+          <ul class="feature-list">
+            <li class="feature-item">
+              <span class="feature-icon">🛡️</span>
+              <div class="feature-text">
+                <strong>Stator & Supply Current Limits</strong>
+                Protege as trilhas da bateria contra <em>brownouts</em> (quedas súbitas de tensão abaixo de 7V que reiniciam o roboRIO) em acelerações agressivas do Swerve e do Flywheel.
+              </div>
+            </li>
+          </ul>
+        </div>
+
+        <div class="card">
+          <div class="card-title">
+            <span class="icon">🔄</span>
+            <span>4. Espelhamento de Aliança Automático (FlippingUtil)</span>
+          </div>
+          <p>O cálculo balístico no <code>ShootCalculator</code> utiliza <code>FlippingUtil</code> do PathPlanner para inverter a coordenada do Hub e alvos secundários dependendo se o robô foi alocado na aliança Azul ou Vermelha pela FMS (Field Management System), eliminando a necessidade de recalibração manual de coordenadas.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 3: MELHORIAS & BUGS -->
+    <section id="melhorias" class="tab-panel">
+      
+      <!-- Bug 1: Botão A -->
+      <div class="alert-box danger">
+        <div class="alert-icon">🐛</div>
+        <div class="alert-content">
+          <h4>Bug Crítico Identificado: Botão A do Joystick com duplo .onFalse()</h4>
+          <p>No arquivo <code>RobotContainer.java</code> (linha 188), o botão A possui dois eventos <code>.onFalse(...)</code> encadeados. O alimentador nunca liga ao pressionar o botão, apenas ao soltar!</p>
+        </div>
+      </div>
+
+      <div class="card" style="margin-bottom: 1.5rem;">
+        <div class="card-title">
+          <span class="icon">🔧</span>
+          <span>Correção Recomendada para o Feeder em RobotContainer.java</span>
+        </div>
+        <p>Veja a diferença exata do código para corrigir o acionamento do alimentador:</p>
+        <div class="code-block">
+<span class="code-diff-remove">// CÓDIGO ATUAL (BUG):</span>
+driverJoystick.a()
+    .onFalse(new InstantCommand(()-> feederSubsystem.setFeederVoltageOut(12), feederSubsystem))
+    .onFalse(new InstantCommand(()-> feederSubsystem.setCoastOut(), feederSubsystem));
+
+<span class="code-diff-add">// CÓDIGO CORRIGIDO (LIGA AO APERTAR, DESLIGA AO SOLTAR):</span>
+driverJoystick.a()
+    .whileTrue(new RunCommand(()-> feederSubsystem.setFeederVoltageOut(12), feederSubsystem))
+    .onFalse(new InstantCommand(()-> feederSubsystem.setCoastOut(), feederSubsystem));
+        </div>
+      </div>
+
+      <!-- Melhoria 2: O Elo Perdido (Indexer) -->
+      <div class="alert-box warning">
+        <div class="alert-icon">⚠️</div>
+        <div class="alert-content">
+          <h4>Gargalo de Mecatrônica: Falta do Subsistema Indexer</h4>
+          <p>O robô possui <code>IntakeSubsystem</code> e <code>FeederSubsystem</code>, mas falta a esteira/rolete intermediário (Indexer) para puxar a peça do coletor e posicioná-la no alimentador do canhão. A pasta <code>subsystems/indexer/</code> foi criada e está pronta para receber a implementação na branch <code>feat/indexer</code>.</p>
+        </div>
+      </div>
+
+      <!-- Melhoria 3: Visão Limelight -->
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-title">
+            <span class="icon">📷</span>
+            <span>Conectar a Limelight ao RobotState</span>
+          </div>
+          <p>A biblioteca <code>LimelightHelpers.java</code> está presente em <code>util/</code> e o método <code>RobotState.addVisionObservation(...)</code> está preparado, porém <strong>nenhuma classe chama esse método periodicamente</strong>!</p>
+          <p><strong>Ação necessária:</strong> Criar um subsistema de visão (<code>VisionSubsystem</code>) ou alimentar o estimador no <code>periodic()</code> do <code>SwerveSubsystem</code> lendo as AprilTags da Limelight para eliminar o desvio acumulado da odometria das rodas.</p>
+        </div>
+
+        <!-- Melhoria 4: Autônomos -->
+        <div class="card">
+          <div class="card-title">
+            <span class="icon">🗺️</span>
+            <span>Configurar AutoBuilder do PathPlanner</span>
+          </div>
+          <p>No momento, o método <code>getAutonomousCommand()</code> em <code>RobotContainer.java</code> retorna <code>null</code>:</p>
+          <div class="code-block">
+public Command getAutonomousCommand() {
+    return null; // ⚠️ Robô não tem autônomo ativo!
+}
+          </div>
+          <p><strong>Ação necessária:</strong> Configurar <code>AutoBuilder.configure(...)</code> no <code>SwerveSubsystem</code> fornecendo os métodos de leitura de pose (<code>RobotState.getEstimatedPose</code>), reset de odometria e acionamento relativo ao robô (<code>ChassisSpeeds</code>).</p>
+        </div>
+      </div>
+
+      <!-- Melhoria 5: Trava de Segurança de Disparo -->
+      <div class="card" style="margin-top: 1.5rem;">
+        <div class="card-title">
+          <span class="icon">🔒</span>
+          <span>Intertravamento de Tiro ("Ready-to-Shoot")</span>
+        </div>
+        <p>Atualmente, o piloto pode ativar o <code>Feeder</code> manualmente mesmo que o <code>Flywheel</code> ainda não tenha atingido a velocidade nominal (ex: 60 RPS) ou a <code>Turret</code> ainda esteja girando para travar no alvo. Se isso acontecer em partida, a nota sairá sem força ou errará o alvo.</p>
+        <p><strong>Melhoria sugerida:</strong> Criar um trigger ou comando composto (<code>Trigger isReadyToShoot = () -> turretSubsystem.isAtSetpoint() && flywheelSubsystem.isAtSpeed();</code>) para liberar a alimentação automaticamente apenas quando o tiro for 100% garantido.</p>
+      </div>
+
+    </section>
+
+    <!-- TAB 4: PIPELINE DA PEÇA & INDEXER -->
+    <section id="pipeline" class="tab-panel">
+      <div class="pipeline-container">
+        <div class="card-title">
+          <span class="icon">🔄</span>
+          <span>Fluxo Físico da Peça de Jogo (Game Piece Lifecycle)</span>
+        </div>
+        <p>Entenda o trajeto completo da peça dentro do robô e o motivo exato de o <strong>Indexer</strong> ser vital:</p>
+
+        <div class="pipeline-track">
+          <div class="pipeline-step ready">
+            <div class="step-title">1. Intake</div>
+            <div class="step-sub">Coleta externa no chão</div>
+            <span class="step-status ok">✅ Implementado</span>
+          </div>
+          <div class="pipeline-arrow">➔</div>
+          <div class="pipeline-step missing">
+            <div class="step-title">2. Indexer</div>
+            <div class="step-sub">Transporte & alinhamento</div>
+            <span class="step-status pendente">❌ Faltando (Porta 14)</span>
+          </div>
+          <div class="pipeline-arrow">➔</div>
+          <div class="pipeline-step ready">
+            <div class="step-title">3. Feeder</div>
+            <div class="step-sub">Injeção rápida (100 RPS)</div>
+            <span class="step-status ok">✅ Implementado</span>
+          </div>
+          <div class="pipeline-arrow">➔</div>
+          <div class="pipeline-step ready">
+            <div class="step-title">4. Shooter</div>
+            <div class="step-sub">Turret + Hood + Flywheel</div>
+            <span class="step-status ok">✅ Implementado</span>
+          </div>
+        </div>
+
+        <div class="alert-box info" style="margin-top: 1.5rem;">
+          <div class="alert-icon">💡</div>
+          <div class="alert-content">
+            <h4>Constantes Já Prontas em Constants.java para o Indexer:</h4>
+            <p>O <code>Indexer</code> já possui todos os parâmetros elétricos e ganhos PID calculados na classe <code>Constants.SubsystemsConstants.IndexerConstants</code>:</p>
+            <ul style="margin-left: 1.2rem; margin-top: 0.5rem; font-size: 0.85rem; color: #cbd5e1;">
+              <li><strong>Porta CAN do Motor:</strong> ID 14</li>
+              <li><strong>Modo Neutro:</strong> <code>Brake</code> (parada firme para reter a peça)</li>
+              <li><strong>Limite de Corrente:</strong> 60 Amperes</li>
+              <li><strong>Velocidade Alvo:</strong> 50 RPS</li>
+              <li><strong>Ganhos PID:</strong> <code>kS = 0.47179</code>, <code>kV = 0.043922</code>, <code>kP = 0.10941</code></li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-title">
+            <span class="icon">🚀</span>
+            <span>Roteiro de Implementação para a branch feat/indexer</span>
+          </div>
+          <p>Para completar o subsistema na pasta recém-criada <code>src/main/java/br/megazord/frc7563/subsystems/indexer/</code>, basta seguir a arquitetura AdvantageKit:</p>
+          <div class="code-block">
+1. IndexerIO.java ➔ Interface com inputs (velocityRps, appliedVolts, currentAmps) e setVoltage(volts)
+2. IndexerIOSim.java ➔ Simulação com DCMotorSim (motor Kraken/Falcon ou NEO)
+3. IndexerIOTalonFX.java ➔ Configuração de hardware Phoenix 6 (Current Limits, Brake mode, Slot 0 gains)
+4. IndexerSubsystem.java ➔ SubsystemBase com periodic() atualizando inputs e comandos run() / stop()
+5. Instanciar em RobotContainer.java ➔ Ligar no modo SIM e REAL e associar ao gatilho de disparo
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 5: MATRIZ DE SUBSISTEMAS -->
+    <section id="tabela" class="tab-panel">
+      <div class="card">
+        <div class="card-title">
+          <span class="icon">📋</span>
+          <span>Matriz de Componentes e Subsistemas (Branch dev)</span>
+        </div>
+        <p>Visão geral de todos os módulos de hardware, portas CAN, arquivos de controle e status atual de desenvolvimento:</p>
+
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>Subsistema</th>
+                <th>Pacote</th>
+                <th>Motores / IDs CAN</th>
+                <th>Camadas IO</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Swerve Drive</strong></td>
+                <td><code>subsystems.swerve</code></td>
+                <td>8x TalonFX (4 drive + 4 steer), 4x CANcoder, 1x Pigeon 2</td>
+                <td><code>SwerveModuleIOSim</code> / <code>IOTalonFx</code><br><code>GyroIOSim</code> / <code>IOPygeon2</code></td>
+                <td><span class="status-badge implemented">✅ Completo (Sim + Real)</span></td>
+              </tr>
+              <tr>
+                <td><strong>Turret (Torreta)</strong></td>
+                <td><code>subsystems.shooter.turret</code></td>
+                <td>1x TalonFX (ID 16)</td>
+                <td><code>TurretIOSim</code> / <code>TurretIOTalonFX</code></td>
+                <td><span class="status-badge implemented">✅ Motion Magic</span></td>
+              </tr>
+              <tr>
+                <td><strong>Hood (Capo)</strong></td>
+                <td><code>subsystems.shooter.hood</code></td>
+                <td>1x TalonFX (ID 18)</td>
+                <td><code>HoodIOSim</code> / <code>HoodIOTalonFX</code></td>
+                <td><span class="status-badge implemented">✅ Malha Fechada</span></td>
+              </tr>
+              <tr>
+                <td><strong>Flywheel (Tiro)</strong></td>
+                <td><code>subsystems.shooter.Flywheel</code></td>
+                <td>2x TalonFX (IDs 17 e 19 Follower)</td>
+                <td><code>FlywheelIOSim</code> / <code>FlywheelIOTalonFX</code></td>
+                <td><span class="status-badge implemented">✅ Velocidade (RPS)</span></td>
+              </tr>
+              <tr>
+                <td><strong>Feeder (Alimentador)</strong></td>
+                <td><code>subsystems.feeder</code></td>
+                <td>2x TalonFX (IDs 15 e 22 Follower)</td>
+                <td><code>FeederIOSim</code> / <code>FeederIOTalonFX</code></td>
+                <td><span class="status-badge implemented">✅ 100 RPS (Ajustar Botão)</span></td>
+              </tr>
+              <tr>
+                <td><strong>Intake (Coletor)</strong></td>
+                <td><code>subsystems.intake</code></td>
+                <td>1x TalonFX</td>
+                <td><code>IntakeIOSim</code> / <code>IntakeIOTalonFX</code></td>
+                <td><span class="status-badge implemented">✅ Auto-Coast</span></td>
+              </tr>
+              <tr>
+                <td><strong>Indexer</strong></td>
+                <td><code>subsystems.indexer</code></td>
+                <td>1x TalonFX (ID 14, 50 RPS, Brake)</td>
+                <td><em>Aguardando criação na branch feat/indexer</em></td>
+                <td><span class="status-badge pending">⚠️ Pendente</span></td>
+              </tr>
+              <tr>
+                <td><strong>LEDs</strong></td>
+                <td><code>subsystems.LedSubsystem</code></td>
+                <td>PWM Port 0 (Addressable LED)</td>
+                <td>Controle direto WPILib</td>
+                <td><span class="status-badge implemented">✅ Feedback de Estado</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+      <p>Gerado pelo assistente de engenharia para a equipe <strong>FRC 7563 Megazord</strong> — Temporada 2026/2027 Biocore</p>
+      <p style="margin-top: 0.35rem;">Código fonte: <a href="https://github.com/MegaZord7563/Biocore2026-SimV2" target="_blank">MegaZord7563/Biocore2026-SimV2</a> · Branch <code>dev</code></p>
+    </footer>
+
+  </div>
+
+  <script>
+    function switchTab(tabId) {
+      // Remove active from all tabs and buttons
+      document.querySelectorAll('.tab-panel').forEach(panel => {
+        panel.classList.remove('active');
+      });
+      document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.classList.remove('active');
+      });
+
+      // Activate selected
+      const targetPanel = document.getElementById(tabId);
+      if (targetPanel) {
+        targetPanel.classList.add('active');
+      }
+
+      const activeBtn = Array.from(document.querySelectorAll('.tab-btn')).find(btn => 
+        btn.getAttribute('onclick').includes(tabId)
+      );
+      if (activeBtn) {
+        activeBtn.classList.add('active');
+      }
+    }
+  </script>
+</body>
+</html>
