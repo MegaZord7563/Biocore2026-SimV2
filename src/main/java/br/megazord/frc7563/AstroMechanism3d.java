@@ -1,7 +1,6 @@
 package br.megazord.frc7563;
 
 import org.littletonrobotics.junction.Logger;
-
 import br.megazord.frc7563.subsystems.shooter.ShooterConstants;
 import br.megazord.frc7563.util.geometry.GeomUtil;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -25,6 +24,7 @@ public class AstroMechanism3d {
 
   @Getter @Setter private Rotation2d turretAngle = Rotation2d.kZero; // Robot-relative
   @Getter @Setter private Rotation2d hoodAngle = Rotation2d.kZero; // Relative to the ground
+  @Getter @Setter private double linearIntakePositionVx = 0.0;
 
 
   public void log()
