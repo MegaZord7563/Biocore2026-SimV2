@@ -99,7 +99,7 @@ public class IndexerIOTalonFX implements IndexerIO {
                         .withPeakReverseVoltage(-12.0)) 
         //--------------Motor Configs-------------------
         .withMotorOutput(new MotorOutputConfigs()
-                        .withInverted(InvertedValue.Clockwise_Positive)
+                        .withInverted(InvertedValue.CounterClockwise_Positive)
                         .withNeutralMode(IndexerConstants.kMotorNeutralMode))
         
         //--------------Closed Loop General--------------

@@ -6,6 +6,7 @@ package br.megazord.frc7563.subsystems.intake;
 
 import org.littletonrobotics.junction.Logger;
 
+import br.megazord.frc7563.AstroMechanism3d;
 import br.megazord.frc7563.Constants.RobotConstants;
 import br.megazord.frc7563.subsystems.intake.IntakeConstants.Pivot;
 import br.megazord.frc7563.subsystems.intake.IntakeConstants.Rollers;
@@ -46,6 +47,8 @@ public class IntakeSubsystem extends SubsystemBase {
 
     pivotDisconnectedAlert.set(!inputs.pivotConnected && RobotConstants.enableAlerts);
     rollersDisconnectedAlert.set(!inputs.rollersConnected && RobotConstants.enableAlerts);
+
+    AstroMechanism3d.getInstance().setLinearIntakePositionVx(inputs.pivotPositionRads * Pivot.kRadsToMMVx);
   }
 
   public void setCoastOut()

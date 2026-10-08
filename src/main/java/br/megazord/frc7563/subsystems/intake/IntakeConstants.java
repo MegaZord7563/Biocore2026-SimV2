@@ -73,6 +73,8 @@ public final class IntakeConstants {
     public static final double kStowedPositionRads = 0.04  * 2 * Math.PI;
     public static final double kDeployedPositionRads = 2.05 * 2 * Math.PI;
     public static final double kStartPositionRads = 2.15 *  2 * Math.PI;
+
+    public static final double kRadsToMMVx = 23.0;
   }
 
   /** The rollers that grab/eject the game piece. */
@@ -101,7 +103,7 @@ public final class IntakeConstants {
     public static final double kD = 0;
 
     /* speeds (rad/s), carried over verbatim from the old IntakeModeSpeed/OutakeModeSpeed - unit not re-verified */
-    public static final double kIntakeSpeedRadsPerSec = 100;
-    public static final double kOuttakeSpeedRadsPerSec = -50;
+    public static final double kIntakeSpeedRadsPerSec = 10000;
+    public static final double kOuttakeSpeedRadsPerSec = -5000;
   }
 }
